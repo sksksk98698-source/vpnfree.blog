@@ -10,15 +10,17 @@ export const SITE = {
     'Demo storefront for astro-njx-store: apparel, desk goods and coffee. Astro + Tailwind, mock data out of the box, Shopify with two env vars.',
   logoDark: '/logo/njx-shop-dark.png', // dark mark — shown on the light theme
   logoLight: '/logo/njx-shop-light.png', // light mark — shown on the dark theme
-  repoUrl: 'https://github.com/njbSaab/astro-njx-store',
-  authorUrl: 'https://njxui.dev',
-  themesUrl: 'https://njxui.dev/themes',
+  // Catalogue-clean placeholders (astro.build/themes rule: social icons must link
+  // to a root domain with no username; only example.com for placeholder URLs).
+  repoUrl: 'https://github.com',
+  authorUrl: 'https://example.com',
+  themesUrl: 'https://example.com',
 } as const;
 
 export const ANNOUNCEMENT = {
   text: 'Free shipping on orders over $75 — roasted and packed every Monday',
-  linkLabel: 'Please ⭐️ on GitHub',
-  linkHref: SITE.repoUrl,
+  linkLabel: 'Shop new arrivals →',
+  linkHref: '/collections/apparel',
 } as const;
 
 export const HEADER = {
@@ -64,11 +66,10 @@ export const FOOTER = {
       ],
     },
     {
-      title: 'Theme',
+      title: 'More',
       links: [
-        { label: 'All themes & Pro', href: SITE.themesUrl },
-        { label: 'GitHub', href: SITE.repoUrl },
-        { label: 'Made by njX', href: SITE.authorUrl },
+        { label: 'Instagram', href: 'https://instagram.com' },
+        { label: 'GitHub', href: 'https://github.com' },
         { label: 'Built with Astro', href: 'https://astro.build' },
       ],
     },
@@ -82,14 +83,14 @@ export const FOOTER = {
 export const THANKS_MODAL = {
   emoji: '🎉',
   title: 'Thanks for the order!',
-  text: 'This is a demo store, so nothing was charged. If you like the theme, a star takes two seconds and helps a lot.',
-  starLabel: '⭐️ Star on GitHub',
-  starHref: SITE.repoUrl,
+  text: 'This is a demo store, so nothing was charged. A confirmation would normally land in your inbox in a minute.',
+  starLabel: 'View your orders',
+  starHref: '/account',
   keepLabel: 'Keep browsing',
-  madeByLabel: 'njX UI',
-  madeByHref: SITE.authorUrl,
-  moreLabel: 'More themes & Pro →',
-  moreHref: SITE.themesUrl,
+  madeByLabel: 'Built with Astro',
+  madeByHref: 'https://astro.build',
+  moreLabel: 'Browse the shop →',
+  moreHref: '/',
 } as const;
 
 export const CART = {
@@ -122,10 +123,10 @@ export const NAV_DRAWER = {
   ],
   footer: {
     builtWithLabel: 'Built with',
-    libLabel: 'njX UI',
-    libHref: SITE.authorUrl,
-    starLabel: '⭐ GitHub',
-    starHref: SITE.repoUrl,
+    libLabel: 'Astro',
+    libHref: 'https://astro.build',
+    starLabel: 'GitHub',
+    starHref: 'https://github.com',
   },
 } as const;
 

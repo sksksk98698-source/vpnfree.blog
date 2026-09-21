@@ -144,7 +144,7 @@ export const CONTACTS = {
   cards: {
     email: {
       title: 'Email',
-      address: 'hi@njx-shop.demo',
+      address: 'hello@example.com',
       note: 'Order number in the subject speeds things up.',
     },
     warehouse: {
@@ -154,8 +154,8 @@ export const CONTACTS = {
     elsewhere: {
       title: 'Elsewhere',
       links: [
-        { label: 'GitHub — this theme', href: SITE.repoUrl },
-        { label: 'njX UI — the library', href: SITE.authorUrl },
+        { label: 'GitHub', href: 'https://github.com' },
+        { label: 'Instagram', href: 'https://instagram.com' },
       ],
     },
   },
@@ -198,7 +198,7 @@ export const FAQ_PAGE = {
     },
     {
       q: 'Do you do wholesale?',
-      a: 'For the desk goods and coffee — yes, from 20 units. Email hi@njx-shop.demo with your shop and volumes.',
+      a: 'For the desk goods and coffee — yes, from 20 units. Email hello@example.com with your shop and volumes.',
     },
     {
       q: 'Is this a real store?',
