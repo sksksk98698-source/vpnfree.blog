@@ -1,186 +1,382 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ProductCard from '../components/ProductCard.astro';
-import { commerce } from '../lib/commerce';
-import { HOME as T } from '../constants/pages';
+import AirportCard from '../components/AirportCard.astro';
+import { AIRPORTS } from '../data/airports';
+import { TOPICS } from '../data/topics';
+import { SITE } from '../constants/components';
 
-const [products, collections] = await Promise.all([
-  commerce.listProducts({ limit: 8 }),
-  commerce.listCollections(),
-]);
-const shelfImages: Record<string, string> = {
-  apparel: '/products/deep-work-hoodie.jpg',
-  desk: '/products/walnut-laptop-stand.jpg',
-  coffee: '/products/midnight-roast.jpg',
+// Guangshiyun is primary featured
+const featuredAirport = AIRPORTS[0];
+const top10Airports = AIRPORTS.slice(0, 10);
+const remainingCount = AIRPORTS.length - 10;
+
+const homeFaq = [
+  {
+    q: '2026 年选翻墙机场，优先看什么指标？',
+    a: '优先看“专线架构（IEPL/IPLC）”与“晚高峰抗拥堵表现”，而非单纯看标称带宽。走公网普通中转的机场在晚间 8~10 点极易因骨干网 QoS 限速出现高延迟丢包；而拥有企业内网专线（如光速云）的品牌能维持恒定毫秒级响应。',
+  },
+  {
+    q: '为什么有的机场打不开 ChatGPT 或 Claude 提示被拦截？',
+    a: 'OpenAI 与 Anthropic 对数据中心公共 IP 封控严密。需要选择配备“原生住宅 IP”或专线解锁中继的机场，且落地地区建议优先选择美国、台湾或日本原生节点。',
+  },
+  {
+    q: '新手应该买月付还是年付套餐？',
+    a: '强烈建议先买月付或轻量版套餐（如 8~25 元档）。在自己常住地的宽带（电信/联通/移动）及晚高峰实测稳定流畅后，再结合长周期折扣码（如半年付8折、年付7折）进行续费。',
+  },
+  {
+    q: '本站推荐的机场是否有官方返利佣金？',
+    a: '本站坚持客观真实测试原则。部分机场注册链接含有推广标识（统一标明 rel="nofollow sponsored noopener"），通过链接注册可能为本站服务器运维提供微薄收入，绝不增加您的支付成本，且本站为您争取了官方独家优惠码（如光速云【AMM】）。',
+  },
+];
+
+const homeFaqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: homeFaq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
 };
 ---
 
-<Layout>
-  <!-- Hero -->
-  <section class="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-4 pt-6 md:grid-cols-[1.1fr_1fr] md:pb-16 md:pt-20">
-    <div>
-      <h1 class="font-display text-[clamp(40px,6vw,72px)] font-extrabold leading-[0.98] tracking-tight">
-        {T.hero.title}
+<Layout
+  title={`${SITE.name} — 2026 翻墙机场与VPN梯子推荐 · 42家品牌晚高峰测速实验室`}
+  description="2026 翻墙机场与网络代理独立观察台。严格实测收录 42 家机场，包含 IEPL/IPLC 专线实测测速大图、ChatGPT/Claude 原生住宅解锁矩阵、全平台客户端下载及独家折扣码。"
+  jsonLd={homeFaqSchema}
+>
+  <!-- Hero Section -->
+  <section class="mx-auto max-w-6xl px-5 pb-8 pt-8 md:pb-16 md:pt-14">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pine/30 bg-pine-soft px-3.5 py-1 text-[13px] font-semibold text-pine mb-5">
+        <span class="inline-block h-2 w-2 rounded-full bg-pine animate-pulse"></span>
+        2026 翻墙机场独立可观测性网络实验室
+      </div>
+      <h1 class="font-display text-[clamp(34px,5.5vw,62px)] font-extrabold leading-[1.08] tracking-tight text-ink">
+        真专线 · 真实测 · 拒绝虚标
+        <br />
+        <span class="text-pine">42 家翻墙机场深度横评</span>
       </h1>
-      <p class="mt-5 max-w-[44ch] text-[17px] leading-relaxed text-muted">{T.hero.text}</p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href={T.hero.ctaPrimary.href} class="rounded-md bg-pine px-6 py-3.5 text-[15px] font-semibold text-white hover:bg-pine-deep">
-          {T.hero.ctaPrimary.label}
+      <p class="mt-5 text-[16px] sm:text-[18px] leading-relaxed text-muted max-w-[58ch] mx-auto">
+        基于多地晚高峰持续监控与 MAI-TEST-BOT 实测报告，深度剖析 IEPL 专线、ChatGPT / Claude 原生住宅解锁、4K 奈飞及超低延迟香港节点。
+      </p>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="#top10" class="rounded-lg bg-pine px-7 py-3.5 text-[15px] font-semibold text-white hover:bg-pine-deep transition shadow-sm">
+          查看 2026 TOP 10 榜单
         </a>
-        <a href={T.hero.ctaSecondary.href} class="rounded-md border border-ink px-6 py-3.5 text-[15px] font-semibold hover:bg-tile">
-          {T.hero.ctaSecondary.label}
+        <a href="/airports" class="rounded-lg border border-line px-7 py-3.5 text-[15px] font-semibold text-ink hover:bg-tile transition">
+          筛选全部 42 家品牌库 &rarr;
+        </a>
+        <a href="/speedtest" class="rounded-lg border border-line px-6 py-3.5 text-[15px] font-semibold text-muted hover:text-ink hover:bg-tile transition flex items-center gap-2">
+          <span>测速大图库</span>
+          <span class="rounded bg-pine/10 text-pine px-1.5 py-0.5 text-xs font-mono">18+ 实测</span>
         </a>
       </div>
-      <p class="mt-6 text-[13px] text-muted">{T.hero.note}</p>
-    </div>
-    <div class="overflow-hidden rounded-xl bg-tile">
-      <img src={T.hero.image.src} alt={T.hero.image.alt} class="aspect-[4/5] w-full object-cover" />
+
+      <!-- Trust Stats Bar -->
+      <div class="mt-12 grid grid-cols-2 gap-4 border-t border-line pt-8 sm:grid-cols-4 text-center">
+        <div>
+          <p class="font-display text-3xl font-bold text-pine font-mono">42</p>
+          <p class="text-[13px] text-muted mt-0.5">收录品牌数据库</p>
+        </div>
+        <div>
+          <p class="font-display text-3xl font-bold text-pine font-mono">18+</p>
+          <p class="text-[13px] text-muted mt-0.5">晚高峰测速大图</p>
+        </div>
+        <div>
+          <p class="font-display text-3xl font-bold text-pine font-mono">100%</p>
+          <p class="text-[13px] text-muted mt-0.5">真实节点数据验证</p>
+        </div>
+        <div>
+          <p class="font-display text-3xl font-bold text-pine font-mono">¥5.6</p>
+          <p class="text-[13px] text-muted mt-0.5">最低月均起步预算</p>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Theme bar: quiet strip under the hero -->
-  <div class="border-y border-line bg-tile/50">
-    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-1 px-5 py-3 text-[13px] text-muted">
-      <span>{T.themeBar.text}</span>
-      <a href={T.themeBar.cta.href} class="font-semibold text-ink underline underline-offset-4 hover:text-pine">{T.themeBar.cta.label}</a>
-      <a href={T.themeBar.cta2.href} class="font-semibold text-ink underline underline-offset-4 hover:text-pine">{T.themeBar.cta2.label}</a>
-    </div>
-  </div>
-
-  <!-- Collections shelf -->
-  <section class="mx-auto max-w-6xl px-5 py-4 sm:py-14">
-    <h2 class="font-display text-3xl font-bold tracking-tight">{T.collections.title}</h2>
-    <div class="mt-7 grid gap-5 sm:grid-cols-3">
-      {collections.filter((c) => shelfImages[c.handle]).map((c) => (
-        <a href={`/collections/${c.handle}`} class="group block">
-          <div class="overflow-hidden rounded-lg bg-tile">
-            <img
-              src={shelfImages[c.handle]}
-              alt={c.title}
-              class="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-              loading="lazy"
-            />
+  <!-- Primary Featured C-Position: 光速云 (Guangshiyun) -->
+  <section class="mx-auto max-w-6xl px-5 pb-12 sm:pb-16">
+    <div class="relative overflow-hidden rounded-3xl border-2 border-pine bg-paper p-6 sm:p-10 shadow-lg">
+      <div class="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-pine/5 blur-3xl pointer-events-none"></div>
+      
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-6 border-b border-line">
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-pine text-white font-mono font-bold text-lg">
+            #1
+          </span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="rounded bg-pine px-2 py-0.5 text-[11px] font-bold text-white uppercase tracking-wider">本站年度主推首选</span>
+              <span class="text-[12px] text-muted font-mono">2020年稳定运营老牌</span>
+            </div>
+            <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-ink mt-0.5">
+              光速云 · IEPL专线 + 企业内网双专线旗舰
+            </h2>
           </div>
-          <h3 class="mt-3 text-[17px] font-semibold group-hover:underline group-hover:underline-offset-4">{c.title}</h3>
-          <p class="mt-1 text-[14px] text-muted">{c.description}</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            data-copy-coupon={featuredAirport.coupon}
+            data-aff-link={featuredAirport.affLink}
+            class="rounded-lg border border-pine/40 bg-pine-soft px-3.5 py-2 font-mono text-[13px] font-bold text-pine hover:bg-pine hover:text-white transition flex items-center gap-1.5"
+          >
+            <span>专属优惠码: {featuredAirport.coupon}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          </button>
+          <a
+            href={featuredAirport.affLink}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="rounded-lg bg-pine px-5 py-2 text-[14px] font-semibold text-white hover:bg-pine-deep transition flex items-center gap-1 shadow-sm"
+          >
+            直达官网开通 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
+        <div>
+          <p class="text-[15px] leading-relaxed text-ink/90 font-medium">
+            光速云是本站实测推荐中综合稳定性与性价比极高的标杆品牌。采用 <strong class="text-pine">IEPL 专线与企业级内网专线双架构</strong>，核心节点覆盖香港×20、台湾×5、日本×10、新加坡×10、美国×10，并配备马来西亚、英国、法国、德国等全球出入口。
+          </p>
+
+          <div class="mt-6 grid grid-cols-2 gap-3 text-[13px] sm:grid-cols-4">
+            <div class="rounded-xl border border-line bg-tile/40 p-3">
+              <span class="text-muted block text-[11px]">入门折算价</span>
+              <strong class="text-pine text-lg font-bold">约 ¥8 /月</strong>
+            </div>
+            <div class="rounded-xl border border-line bg-tile/40 p-3">
+              <span class="text-muted block text-[11px]">传输协议</span>
+              <strong class="text-ink text-base font-semibold">VLESS 原生</strong>
+            </div>
+            <div class="rounded-xl border border-line bg-tile/40 p-3">
+              <span class="text-muted block text-[11px]">香港延迟实测</span>
+              <strong class="text-ink text-base font-semibold font-mono">22ms 极速</strong>
+            </div>
+            <div class="rounded-xl border border-line bg-tile/40 p-3">
+              <span class="text-muted block text-[11px]">最高实测带宽</span>
+              <strong class="text-pine text-base font-semibold font-mono">529 Mbps</strong>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-2 text-[14px]">
+            <div class="flex items-start gap-2.5">
+              <span class="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-pine/10 text-pine font-bold text-xs">✓</span>
+              <span><strong>双专线链路冗余：</strong>IEPL 专线结合优质隧道中转，晚高峰 4K 视频秒起步，杜绝断流与频繁换节点。</span>
+            </div>
+            <div class="flex items-start gap-2.5">
+              <span class="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-pine/10 text-pine font-bold text-xs">✓</span>
+              <span><strong>AI 与流媒体全解锁：</strong>深度支持 ChatGPT、Claude 3.5、Netflix、Disney+、YouTube 4K、TikTok 及海外社交矩阵。</span>
+            </div>
+            <div class="flex items-start gap-2.5">
+              <span class="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-pine/10 text-pine font-bold text-xs">✓</span>
+              <span><strong>套餐梯度极广：</strong>从 99元/年轻量版（每月69GB），到 147元斯诺克永久版（247GB不过期），再到月付极速版，丰俭由人。</span>
+            </div>
+          </div>
+
+          <div class="mt-8 flex items-center gap-4">
+            <a href="/airports/guangshiyun" class="font-semibold text-pine underline underline-offset-4 hover:opacity-85 text-[14px]">
+              阅读光速云完整深度测评报告（含6张实测图）&rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Featured Speedtest Preview Box -->
+        <div class="rounded-2xl border border-line bg-tile/60 p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[12px] font-semibold text-muted font-mono uppercase tracking-wider">MAI-TEST-BOT 实测大图</span>
+              <span class="rounded bg-emerald-500/10 text-emerald-600 text-[11px] px-2 py-0.5 font-mono">2026 最新打卡</span>
+            </div>
+            <a href="/airports/guangshiyun" class="group block overflow-hidden rounded-xl border border-line bg-ink/5">
+              <img
+                src="/speedtests/guangshiyun-speedtest.png"
+                alt="光速云 节点测速实测大图"
+                class="w-full aspect-[16/10] object-cover transition duration-300 group-hover:scale-105"
+                loading="lazy"
+                width="480"
+                height="300"
+              />
+            </a>
+            <p class="mt-2.5 text-[12px] text-muted text-center">
+              点击查看高清节点跑速图及流媒体解锁实测大图
+            </p>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-line/60 flex items-center justify-between">
+            <div>
+              <span class="text-[11px] text-muted block">新人专属折后起步</span>
+              <span class="font-display text-xl font-bold text-pine">折合 ¥8 /月起</span>
+            </div>
+            <a
+              href={featuredAirport.affLink}
+              target="_blank"
+              rel="nofollow sponsored noopener"
+              class="rounded-lg bg-pine px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-pine-deep transition flex items-center gap-1 shadow-sm"
+            >
+              立即开通
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOP 10 Airport Ranking Section -->
+  <section id="top10" class="mx-auto max-w-6xl px-5 py-8 sm:py-16 scroll-mt-20">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      <div>
+        <div class="flex items-center gap-2 text-pine font-semibold text-[13px] uppercase tracking-wider mb-1">
+          <span>Ranking Matrix</span>
+          <span>·</span>
+          <span>前十核心推荐榜单</span>
+        </div>
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+          2026 翻墙机场综合排名 TOP 10
+        </h2>
+      </div>
+      <a href="/airports" class="text-[14px] font-semibold text-pine hover:underline">
+        查看全部 42 家机场品牌库 &rarr;
+      </a>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {top10Airports.map((airport, index) => (
+        <AirportCard airport={airport} featured={index === 0} />
+      ))}
+    </div>
+
+    <!-- View All CTA Box -->
+    <div class="mt-10 rounded-2xl border border-line bg-tile/50 p-6 sm:p-8 text-center flex flex-col items-center justify-center">
+      <h3 class="font-display text-2xl font-bold text-ink">
+        还有其余 {remainingCount} 家备选机场品牌？
+      </h3>
+      <p class="mt-2 text-[15px] text-muted max-w-[48ch]">
+        涵盖 U1S1、宇宙云、灵猫网络、极连云、光年梯、一翻云、SOGO云、可信云、速界、全球云等 32 家平价及小众品牌。
+      </p>
+      <a
+        href="/airports"
+        class="mt-5 rounded-lg bg-ink px-6 py-3 text-[14px] font-semibold text-paper hover:bg-pine transition"
+      >
+        进入 42 家机场品牌库完整筛选
+      </a>
+    </div>
+  </section>
+
+  <!-- GEO & Scenario Topics Matrix -->
+  <section class="mx-auto max-w-6xl px-5 py-8 sm:py-16 border-t border-line">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <span class="text-[13px] font-semibold text-pine uppercase tracking-wider">GEO & Scenario Guides</span>
+      <h2 class="mt-2 font-display text-3xl font-extrabold text-ink">
+        按使用场景与专属地区专线选型
+      </h2>
+      <p class="mt-3 text-[15px] text-muted">
+        拒绝眉毛胡子一把抓，根据你的具体网络需求快速定位最佳机场梯队。
+      </p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {TOPICS.map((topic) => (
+        <a
+          href={`/topics/${topic.slug}`}
+          class="group rounded-2xl border border-line bg-paper p-6 hover:border-pine hover:shadow-md transition flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-3xl">{topic.icon}</span>
+              <span class="rounded bg-pine-soft px-2 py-0.5 text-[11px] font-semibold text-pine">{topic.badge}</span>
+            </div>
+            <h3 class="mt-4 font-display text-xl font-bold text-ink group-hover:text-pine transition">
+              {topic.title}
+            </h3>
+            <p class="mt-2 text-[13px] leading-relaxed text-muted">
+              {topic.subtitle}
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-line text-[13px] font-semibold text-pine flex items-center justify-between">
+            <span>查看专项测评</span>
+            <span class="transition group-hover:translate-x-1">&rarr;</span>
+          </div>
         </a>
       ))}
     </div>
   </section>
 
-  <!-- Products -->
-  <section class="mx-auto max-w-6xl px-5 py-4 sm:py-14">
-    <div class="flex items-baseline justify-between">
-      <h2 class="font-display text-3xl font-bold tracking-tight">{T.products.title}</h2>
-      <p class="text-[14px] text-muted">{products.length} {T.products.countLabel}</p>
-    </div>
-    <div class="mt-7 grid grid-cols-2 gap-x-5 gap-y-5 md:grid-cols-4">
-      {products.map((p) => <ProductCard product={p} />)}
-    </div>
-  </section>
-
-  <!-- Values -->
-  <section class="mx-auto max-w-6xl px-5 pb-4 sm:pb-8">
-    <div class="grid gap-4 rounded-2xl border border-line bg-tile/60 p-4 sm:grid-cols-3 sm:gap-8 sm:p-10">
-      <div>
-        <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-pine-soft text-pine">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m12 3 9 5-9 5-9-5 9-5z" /><path d="m3 12.5 9 5 9-5" /><path d="m3 17 9 5 9-5" />
-          </svg>
+  <!-- Speedtest Lab Banner -->
+  <section class="mx-auto max-w-6xl px-5 py-8 sm:py-16">
+    <div class="rounded-3xl border border-line bg-gradient-to-br from-tile/80 to-paper p-6 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="max-w-xl">
+        <span class="rounded bg-emerald-500/10 text-emerald-600 px-2.5 py-1 text-xs font-mono font-bold uppercase">
+          Network Observatory
         </span>
-        <h3 class="mt-4 text-[16px] font-semibold">{T.values[0].title}</h3>
-        <p class="mt-2 text-[14px] leading-relaxed text-muted">{T.values[0].text}</p>
-      </div>
-      <div>
-        <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-pine-soft text-pine">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="12" cy="12" rx="7" ry="9" /><path d="M12 3c-3 3.5-3 14.5 0 18" transform="rotate(35 12 12)" />
-          </svg>
-        </span>
-        <h3 class="mt-4 text-[16px] font-semibold">{T.values[1].title}</h3>
-        <p class="mt-2 text-[14px] leading-relaxed text-muted">{T.values[1].text}</p>
-      </div>
-      <div>
-        <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-pine-soft text-pine">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" />
-          </svg>
-        </span>
-        <h3 class="mt-4 text-[16px] font-semibold">{T.values[2].title}</h3>
-        <p class="mt-2 text-[14px] leading-relaxed text-muted">{T.values[2].text}</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Quote -->
-  <section class="mx-auto max-w-3xl px-5 py-10 text-center sm:py-16">
-    <blockquote class="font-display text-[clamp(22px,3vw,30px)] font-semibold leading-snug">
-      {T.quote.text}
-    </blockquote>
-    <p class="mt-4 text-[14px] text-muted">{T.quote.author}</p>
-  </section>
-
-  <!-- Theme colophon: this store is the product -->
-  <section class="mx-auto max-w-6xl px-5 pb-4 sm:pb-8">
-    <div class="grid gap-5 rounded-2xl border border-pine-deep bg-pine p-4 text-white sm:gap-10 sm:p-10 md:grid-cols-[1.2fr_1fr] md:items-center">
-      <div>
-        <p class="text-[13px] font-medium text-white/70">{T.colophon.eyebrow}</p>
-        <h2 class="mt-3 font-display text-[clamp(26px,3.5vw,38px)] font-bold leading-tight tracking-tight">
-          {T.colophon.title}
+        <h2 class="mt-3 font-display text-3xl sm:text-4xl font-extrabold text-ink">
+          晚高峰测速实验室与解锁矩阵
         </h2>
-        <p class="mt-4 max-w-[52ch] text-[15px] leading-relaxed text-white/85">{T.colophon.text}</p>
-        <div class="mt-7 flex flex-wrap gap-3">
-          <a href={T.colophon.ctaPrimary.href} class="rounded-md bg-white px-6 py-3.5 text-[15px] font-semibold text-pine hover:bg-white/90">
-            {T.colophon.ctaPrimary.label}
+        <p class="mt-3 text-[15px] leading-relaxed text-muted">
+          我们收集并整理了 18+ 家品牌的真实跑速截图、MAI-TEST-BOT 原始测试记录，真实展示香港、日本、新加坡及美国节点在 20:00 晚高峰期间的延迟抖动与下载速率。
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="/speedtest" class="rounded-lg bg-pine px-6 py-3 text-[14px] font-semibold text-white hover:bg-pine-deep transition">
+            浏览全部测速图库 &rarr;
           </a>
-          <a href={T.colophon.ctaSecondary.href} class="rounded-md border border-white/40 px-6 py-3.5 text-[15px] font-semibold text-white hover:bg-white/10">
-            {T.colophon.ctaSecondary.label}
-          </a>
-          <a href={T.colophon.ctaThemes.href} class="px-2 py-3.5 text-[15px] font-semibold text-white/80 underline decoration-white/40 underline-offset-4 hover:text-white">
-            {T.colophon.ctaThemes.label}
+          <a href="/clients" class="rounded-lg border border-line px-6 py-3 text-[14px] font-semibold text-ink hover:bg-tile transition">
+            下载代理客户端 (Clash/v2rayN)
           </a>
         </div>
       </div>
-      <ul class="grid min-w-0 gap-3 rounded-xl bg-pine-deep/60 p-4 text-[14px] leading-relaxed sm:p-7">
-        {T.colophon.stack.map((s, i) => (
-          <li class="flex gap-3">
-            <span class="mt-0.5 text-white/60">{String(i + 1).padStart(2, '0')}</span>
-            <span><strong class="font-semibold">{s.strong}</strong> {s.text}</span>
-          </li>
-        ))}
-        <li>
-          <button
-            type="button"
-            data-copy-env={T.colophon.env.copyValue}
-            class="group/copy mt-2 flex w-full items-center justify-between gap-3 rounded-md bg-black/25 px-4 py-2.5 text-left font-mono text-[13px] text-white/90 transition hover:bg-black/35"
-            aria-label={`Copy ${T.colophon.env.copyValue} to clipboard`}
-          >
-            <span>{T.colophon.env.prefix}<span class="text-white">{T.colophon.env.value}</span></span>
-            <span data-copy-icon class="text-white/60 transition group-hover/copy:text-white">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" />
-              </svg>
-            </span>
-            <span data-copy-done class="hidden text-[12px] font-sans font-semibold text-white">{T.colophon.env.copiedLabel}</span>
-          </button>
-        </li>
-      </ul>
+
+      <div class="w-full md:w-auto shrink-0 flex items-center justify-center">
+        <div class="relative w-72 sm:w-80 rounded-2xl border border-line bg-paper p-4 shadow-md rotate-1 hover:rotate-0 transition duration-300">
+          <div class="flex items-center justify-between text-xs font-mono text-muted mb-2">
+            <span>MAI-TEST-BOT 2.0</span>
+            <span class="text-emerald-600 font-bold">● 2026 实测</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between items-center bg-tile/50 p-2 rounded">
+              <span>🇭🇰 香港 IEPL 01</span>
+              <span class="font-mono font-bold text-pine">529 Mbps (22ms)</span>
+            </div>
+            <div class="flex justify-between items-center bg-tile/50 p-2 rounded">
+              <span>🇸🇬 新加坡 专线 01</span>
+              <span class="font-mono font-bold text-pine">419 Mbps (43ms)</span>
+            </div>
+            <div class="flex justify-between items-center bg-tile/50 p-2 rounded">
+              <span>🇯🇵 日本 东京 专线</span>
+              <span class="font-mono font-bold text-pine">260 Mbps (55ms)</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <script>
-    document.querySelectorAll<HTMLButtonElement>('[data-copy-env]').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        await navigator.clipboard.writeText(btn.dataset.copyEnv!);
-        const icon = btn.querySelector('[data-copy-icon]')!;
-        const done = btn.querySelector('[data-copy-done]')!;
-        icon.classList.add('hidden');
-        done.classList.remove('hidden');
-        setTimeout(() => {
-          done.classList.add('hidden');
-          icon.classList.remove('hidden');
-        }, 1600);
-      });
-    });
-  </script>
+  <!-- Beginner Guide & FAQ -->
+  <section class="mx-auto max-w-4xl px-5 py-8 sm:py-16 border-t border-line">
+    <div class="text-center mb-10">
+      <span class="text-[13px] font-semibold text-pine uppercase tracking-wider">FAQ & Selection Guide</span>
+      <h2 class="mt-2 font-display text-3xl font-extrabold text-ink">
+        新手翻墙选型与避坑答疑
+      </h2>
+    </div>
+
+    <div class="rounded-2xl border border-line bg-tile/40 px-6 sm:px-8 divide-y divide-line">
+      {homeFaq.map((item) => (
+        <details class="group py-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-ink">
+            {item.q}
+            <span class="shrink-0 text-muted transition duration-200 group-open:rotate-45 text-xl font-light">+</span>
+          </summary>
+          <p class="max-w-[62ch] pt-3 text-[15px] leading-relaxed text-muted">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
 </Layout>

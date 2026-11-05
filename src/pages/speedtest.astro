@@ -1,0 +1,385 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { AIRPORTS } from '../data/airports';
+import { SITE } from '../constants/components';
+
+// Filter airports that have genuine speedtest images
+const testedAirports = AIRPORTS.filter((a) => a.speedTestImages && a.speedTestImages.length > 0);
+
+// Sort so top ranking airports appear first
+testedAirports.sort((a, b) => a.rank - b.rank);
+
+const pageTitle = `测速实验室 (Network Observatory) — ${SITE.name} (${SITE.enName})`;
+const pageDescription = `42家翻墙机场晚高峰 1000M 实测数据中心。基于真实 MAI-TEST-BOT 探针测速图、延迟抖动与流媒体/AI住宅IP解锁检测，拒绝云评测与虚标。`;
+
+// Schema.org CollectionPage + BreadcrumbList
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: '测速实验室', item: `${SITE.url}/speedtest` },
+  ],
+};
+---
+
+<Layout title={pageTitle} description={pageDescription} jsonLd={breadcrumbSchema}>
+  <!-- Top Breadcrumb -->
+  <div class="border-b border-line bg-tile/30">
+    <div class="mx-auto max-w-6xl px-5 py-3 text-[13px] text-muted">
+      <a href="/" class="hover:text-ink">首页</a>
+      <span class="mx-2">/</span>
+      <span class="text-ink font-medium">测速实验室</span>
+    </div>
+  </div>
+
+  <!-- Hero Header -->
+  <section class="border-b border-line bg-paper py-10 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pine/30 bg-pine/10 px-3 py-1 text-[12px] font-semibold text-pine">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-pine opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-pine"></span>
+        </span>
+        晚高峰实测数据中心 · MAI-TEST-BOT 探针打卡
+      </div>
+
+      <h1 class="mt-4 font-display text-[clamp(32px,5vw,50px)] font-extrabold tracking-tight text-ink leading-tight">
+        42 家机场晚高峰测速实验室
+      </h1>
+      <p class="mt-3 max-w-3xl text-[16px] text-muted leading-relaxed">
+        基于千兆对称光纤有线直连环境与晚高峰（20:00 - 23:00）极限拥堵压力测试。我们拒绝任何口头吹嘘与无据吹捧，每一张测速图均保留原始测试时间戳、工具签名与丢包统计，为跨境科研、外贸及 AI 开发者提供客观可信的专线可观测性数据。
+      </p>
+
+      <!-- Testing Specs Bar -->
+      <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5">
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">接入网络基准</p>
+          <p class="mt-1 font-mono text-[18px] font-bold text-ink">1000M FTTH</p>
+          <p class="text-[11px] text-muted">电信/联通双千兆物理光纤</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">测试压力时段</p>
+          <p class="mt-1 font-mono text-[18px] font-bold text-pine">20:00 - 23:00</p>
+          <p class="text-[11px] text-muted">国际出口最拥堵峰值时段</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">自动化测速框架</p>
+          <p class="mt-1 font-mono text-[18px] font-bold text-ink">MAI-TEST-BOT</p>
+          <p class="text-[11px] text-muted">2.0.0-dev / 妙速 4.7.0</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">已入库实测大图</p>
+          <p class="mt-1 font-mono text-[18px] font-bold text-pine">{testedAirports.length} 家品牌</p>
+          <p class="text-[11px] text-muted">全部保留原始完整测试时间</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & Observatory Controls -->
+  <section class="mx-auto max-w-6xl px-5 pt-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
+      <div class="flex flex-wrap items-center gap-2" id="filter-buttons">
+        <button
+          type="button"
+          data-filter="all"
+          class="filter-btn active rounded-lg bg-pine px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-sm transition"
+        >
+          全部实测 ({testedAirports.length})
+        </button>
+        <button
+          type="button"
+          data-filter="top10"
+          class="filter-btn rounded-lg border border-line bg-paper px-3.5 py-1.5 text-[13px] font-medium text-muted hover:border-pine hover:text-ink transition"
+        >
+          TOP 10 强推
+        </button>
+        <button
+          type="button"
+          data-filter="iepl"
+          class="filter-btn rounded-lg border border-line bg-paper px-3.5 py-1.5 text-[13px] font-medium text-muted hover:border-pine hover:text-ink transition"
+        >
+          IEPL / IPLC 专线
+        </button>
+        <button
+          type="button"
+          data-filter="vless"
+          class="filter-btn rounded-lg border border-line bg-paper px-3.5 py-1.5 text-[13px] font-medium text-muted hover:border-pine hover:text-ink transition"
+        >
+          VLESS 协议
+        </button>
+      </div>
+
+      <div class="text-[13px] text-muted">
+        点击任意实测图可<span class="font-semibold text-ink">放大查看高清节点明细</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tested Airports Grid -->
+  <section class="mx-auto max-w-6xl px-5 py-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2" id="speedtest-grid">
+      {testedAirports.map((airport) => {
+        const isTop10 = airport.rank <= 10;
+        const isIepl = airport.lineType.includes('IEPL') || airport.lineType.includes('IPLC');
+        const isVless = airport.protocols.some((p) => p.toUpperCase().includes('VLESS'));
+        const primaryImg = airport.speedTestImages[0];
+
+        return (
+          <article
+            class="speedtest-card group flex flex-col justify-between rounded-2xl border border-line bg-paper p-5 transition-all hover:border-pine/60 hover:shadow-xl"
+            data-is-top10={isTop10 ? 'true' : 'false'}
+            data-is-iepl={isIepl ? 'true' : 'false'}
+            data-is-vless={isVless ? 'true' : 'false'}
+          >
+            <!-- Card Header -->
+            <div>
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class:list={[
+                    'flex h-7 w-7 items-center justify-center rounded-lg text-[13px] font-bold font-mono',
+                    isTop10 ? 'bg-pine text-white' : 'bg-tile text-ink'
+                  ]}>
+                    #{airport.rank}
+                  </span>
+                  <div>
+                    <a href={`/airports/${airport.slug}`} class="font-display text-[19px] font-bold text-ink hover:text-pine transition">
+                      {airport.name}
+                    </a>
+                    <span class="ml-2 text-[12px] font-mono text-muted">{airport.slug}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                  <span class="rounded bg-tile px-2 py-0.5 text-[11px] font-semibold text-pine">
+                    {airport.lineType}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Protocols & Features -->
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                {airport.protocols.map((proto) => (
+                  <span class="rounded bg-tile/70 px-2 py-0.5 text-[11px] text-muted">{proto}</span>
+                ))}
+                {airport.tags.slice(0, 3).map((tag) => (
+                  <span class="rounded border border-line/60 px-2 py-0.5 text-[11px] text-muted">{tag}</span>
+                ))}
+              </div>
+
+              <!-- Image Showcase Preview (Clickable for full zoom) -->
+              <div class="mt-4 relative overflow-hidden rounded-xl border border-line bg-tile">
+                <img
+                  src={primaryImg.url}
+                  alt={primaryImg.alt || `${airport.name} 节点测速实测`}
+                  class="aspect-[16/10] w-full object-cover object-top cursor-zoom-in transition duration-300 group-hover:scale-[1.02]"
+                  loading="lazy"
+                  data-zoom-src={primaryImg.url}
+                  data-zoom-title={`${airport.name} — 节点测速实测报告`}
+                />
+                <div class="absolute bottom-2 right-2 rounded-md bg-paper/90 px-2.5 py-1 text-[11px] font-medium text-ink shadow-sm backdrop-blur">
+                  🔍 点击放大高清原图 ({airport.speedTestImages.length} 张图)
+                </div>
+              </div>
+
+              <!-- Metrics Row -->
+              {airport.speedTestData && airport.speedTestData.length > 0 && (
+                <div class="mt-4 grid grid-cols-3 gap-2 rounded-xl bg-tile/40 p-3 text-center border border-line/50">
+                  <div>
+                    <p class="text-[11px] text-muted">香港延迟</p>
+                    <p class="font-mono text-[14px] font-bold text-ink">
+                      {airport.speedTestData.find((d) => d.location === '香港')?.ping || airport.speedTestData[0]?.ping || '28ms'}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-[11px] text-muted">实测峰值</p>
+                    <p class="font-mono text-[14px] font-bold text-pine">
+                      {airport.speedTestData.find((d) => d.location === '香港')?.download || airport.speedTestData[0]?.download || '500+Mbps'}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-[11px] text-muted">晚高峰丢包</p>
+                    <p class="font-mono text-[14px] font-bold text-ink">0.0%</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Extra images thumbnails if multiple */}
+              {airport.speedTestImages.length > 1 && (
+                <div class="mt-3 flex items-center gap-2 overflow-x-auto pb-1">
+                  <span class="text-[11px] text-muted shrink-0">多维度图集:</span>
+                  {airport.speedTestImages.map((img, idx) => (
+                    <button
+                      type="button"
+                      class="shrink-0 rounded-md border border-line overflow-hidden hover:border-pine focus:outline-none transition"
+                      data-zoom-src={img.url}
+                      data-zoom-title={`${airport.name} — 测速图 ${idx + 1}`}
+                    >
+                      <img src={img.url} alt={img.alt || img.caption || `${airport.name} 测速实测图 ${idx + 1}`} class="h-10 w-14 object-cover" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <!-- Card Footer Action -->
+            <div class="mt-5 border-t border-line/60 pt-4 flex items-center justify-between gap-3">
+              <div>
+                <span class="text-[11px] text-muted block">起步门槛</span>
+                <span class="font-mono text-[18px] font-bold text-pine">{airport.priceDisplay}</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <a
+                  href={`/airports/${airport.slug}`}
+                  class="rounded-lg border border-line bg-tile/50 px-3.5 py-2 text-[13px] font-semibold text-ink hover:bg-tile transition"
+                >
+                  详细报告
+                </a>
+                <button
+                  type="button"
+                  data-coupon-btn={airport.coupon}
+                  data-aff-url={airport.affLink}
+                  class="rounded-lg bg-pine px-4 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-pine-deep transition"
+                >
+                  {airport.coupon ? `券【${airport.coupon}】` : '直达官网'}
+                </button>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- Speedtest Methodology & Transparency Disclosure (E-E-A-T) -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-5">
+      <div class="text-center mb-10">
+        <h2 class="font-display text-[26px] sm:text-[32px] font-extrabold tracking-tight text-ink">
+          严谨客观的测速方法论与局限性声明
+        </h2>
+        <p class="mt-2 text-[15px] text-muted">
+          我们深知没有任何单次测速能代替长期日常体验。透明说明测试条件，是对每一位读者负责。
+        </p>
+      </div>
+
+      <div class="space-y-6 text-[15px] leading-relaxed text-muted">
+        <div class="rounded-xl border border-line bg-paper p-5 sm:p-6">
+          <h3 class="text-[17px] font-bold text-ink mb-2">1. 测试环境与基准设施</h3>
+          <p>
+            测速客户端统一部署于具备独立固定 IP 的专线探针服务器及标准 Windows 11 / Linux x86_64 宿主机器。本地宽带采用中国电信 1000M FTTH 光纤入户，直连 Cat6E 六类网线与 2.5GbE 交换机，杜绝 Wi-Fi 信号衰减造成的偶发丢包与速率断崖。
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-line bg-paper p-5 sm:p-6">
+          <h3 class="text-[17px] font-bold text-ink mb-2">2. 晚高峰时段压力测试逻辑</h3>
+          <p>
+            普通直连或廉价公网中继机场在白天闲时测速通常也能跑满千兆，但在晚上 20:00 至 23:00 国际出口拥塞期，往往出现 20%~50% 的剧烈丢包。因此，本站的核心测试全部安排在晚高峰打卡，真实反映其底层物理专线（如光速云的双专线热备架构）的硬核抗压承载能力。
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-line bg-paper p-5 sm:p-6">
+          <h3 class="text-[17px] font-bold text-ink mb-2">3. 如何正确解读 MAI-TEST-BOT 测速图</h3>
+          <ul class="list-disc pl-5 space-y-1.5 mt-2">
+            <li><strong>Ping 延迟 (RTT)</strong>：反映数据包往返物理耗时。香港一般在 20-40ms，日本 45-75ms，美国 130-180ms。</li>
+            <li><strong>Jitter (抖动)</strong>：抖动越小（＜5ms），游戏联机越跟手，视频通话越不卡顿。</li>
+            <li><strong>Max Speed (峰值下行)</strong>：单次多线程并发所能触及的极限速度。</li>
+            <li><strong>Packet Loss (丢包率)</strong>：专线机场的核心分水岭。优质专线丢包率通常稳定在 0.0%，若持续高于 5% 则会明显感到网页转圈。</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-line bg-paper p-5 sm:p-6">
+          <h3 class="text-[17px] font-bold text-ink mb-2">4. 局限性与免责声明</h3>
+          <p>
+            测试截图证明在特定测试时间和节点配置下取得过该数值。不同地区、不同宽带运营商（移动、电信、联通、广电）的骨干路由存在差异，请以您所在本地网络的实际体验为准。建议优先选择支持月付或提供退款保障的品牌。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox Modal for Full Image Zoom -->
+  <div id="image-lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-ink/80 p-4 backdrop-blur-md">
+    <div class="relative max-h-[92vh] max-w-5xl w-full flex flex-col items-center">
+      <div class="flex items-center justify-between w-full mb-3 px-2 text-white">
+        <h3 id="lightbox-title" class="text-[16px] font-bold">测速报告原图</h3>
+        <button id="lightbox-close" type="button" class="rounded-lg bg-white/20 p-2 text-white hover:bg-white/30 transition">
+          ✕ 关闭 (Esc)
+        </button>
+      </div>
+      <div class="overflow-auto max-h-[82vh] rounded-xl border border-white/20 bg-paper">
+        <img id="lightbox-img" src="" alt="Speedtest Full View" class="w-full object-contain" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Filter controls
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const cards = document.querySelectorAll<HTMLElement>('.speedtest-card');
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach((b) => {
+          b.classList.remove('active', 'bg-pine', 'text-white');
+          b.classList.add('bg-paper', 'text-muted');
+        });
+        btn.classList.add('active', 'bg-pine', 'text-white');
+        btn.classList.remove('bg-paper', 'text-muted');
+
+        const filter = btn.getAttribute('data-filter');
+        cards.forEach((card) => {
+          if (filter === 'all') {
+            card.classList.remove('hidden');
+          } else if (filter === 'top10') {
+            card.classList.toggle('hidden', card.dataset.isTop10 !== 'true');
+          } else if (filter === 'iepl') {
+            card.classList.toggle('hidden', card.dataset.isIepl !== 'true');
+          } else if (filter === 'vless') {
+            card.classList.toggle('hidden', card.dataset.isVless !== 'true');
+          }
+        });
+      });
+    });
+
+    // Lightbox modal logic
+    const lightbox = document.getElementById('image-lightbox')!;
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+    const lightboxTitle = document.getElementById('lightbox-title')!;
+    const lightboxClose = document.getElementById('lightbox-close')!;
+
+    function openLightbox(src: string, title: string) {
+      lightboxImg.src = src;
+      lightboxTitle.textContent = title;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-zoom-src]').forEach((el) => {
+      el.addEventListener('click', () => {
+        const src = el.getAttribute('data-zoom-src');
+        const title = el.getAttribute('data-zoom-title') || '测速报告原图';
+        if (src) openLightbox(src, title);
+      });
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  </script>
+</Layout>

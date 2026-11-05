@@ -1,11 +1,10 @@
 /**
- * Client-side cart on nanostores (persisted to localStorage).
- * Pages render server-side; the cart drawer hydrates on the client.
+ * Client-side shopping cart powered by nanostores and localStorage persistence.
  */
 import { persistentAtom } from '@nanostores/persistent';
 import type { CartLine } from './commerce/types';
 
-export const cartLines = persistentAtom<CartLine[]>('njx-store-cart', [], {
+export const cartLines = persistentAtom<CartLine[]>('store-cart-v1', [], {
   encode: JSON.stringify,
   decode: JSON.parse,
 });

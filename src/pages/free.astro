@@ -1,0 +1,284 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { FREE_TOOLS, FREE_VS_PAID, FREE_TRIAL_AIRPORTS } from '../data/free-resources';
+import { SITE } from '../constants/components';
+
+const pageTitle = `2026 免费科学上网与免费VPN资源指南 — ${SITE.name} (${SITE.enName})`;
+const pageDescription = `汇总正规合规免费科学上网资源、Cloudflare WARP 无限流量优选、Proton VPN 免费版评测、免费签到试用机场。附免费与正规专线晚高峰实测对比表与避坑指南。`;
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: '免费专区', item: `${SITE.url}/free` },
+  ],
+};
+
+const freeFaqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '市面上声称“永久免费、不限速”的 VPN 靠谱吗？它们的盈利模式是什么？',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '天下没有免费的午餐。维持海外服务器与国际带宽开销极其昂贵。所谓“永久免费不限速”的第三方未知 VPN，其幕后盈利模式通常包括：在客户端内植入弹窗恶意广告、收集并倒卖用户的真实 IP 与浏览历史记录，甚至在数据包中植入挖矿木马。切勿在不可信的免费节点中登录个人邮箱、网银或核心业务账号。',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '为什么免费 VPN 几乎完全无法使用 ChatGPT 或 Claude？',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'OpenAI 与 Anthropic 引入了 Cloudflare 等顶级防滥用风控体系。免费节点的机房 IP 早已被全球数以万计的爬虫和白嫖用户标记为黑名单，访问时会百分之百触发“Access Denied”或封号提示。要稳定使用 AI 工具，必须使用具备海外原生住宅 IP 落地池的专线机场。',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '什么时候可以放心使用免费资源？',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '免费资源最适合两种场景：① 突发断网时的紧急过渡（如查找临时学术论文、下载 GitHub 源码）；② 用于下载正规付费专线客户端与注册官网的“应急梯子”。日常办公、视频娱乐与跨境交易强烈建议使用支持月付的平价专线。',
+      },
+    },
+  ],
+};
+---
+
+<Layout title={pageTitle} description={pageDescription} jsonLd={[breadcrumbSchema, freeFaqSchema]}>
+  <!-- Top Breadcrumb -->
+  <div class="border-b border-line bg-tile/30">
+    <div class="mx-auto max-w-6xl px-5 py-3 text-[13px] text-muted">
+      <a href="/" class="hover:text-ink">首页</a>
+      <span class="mx-2">/</span>
+      <span class="text-ink font-medium">免费专区 · 科学上网与免费VPN指南</span>
+    </div>
+  </div>
+
+  <!-- Hero Header -->
+  <section class="border-b border-line bg-paper py-10 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pine/30 bg-pine/10 px-3 py-1 text-[12px] font-semibold text-pine">
+        零成本应急起步 · 正规合规工具精选
+      </div>
+      <h1 class="mt-4 font-display text-[clamp(32px,5vw,50px)] font-extrabold tracking-tight text-ink leading-tight">
+        2026 免费科学上网与免费 VPN 全景指南
+      </h1>
+      <p class="mt-3 max-w-3xl text-[16px] text-muted leading-relaxed">
+        作为专业网络可观测性平台，我们完全理解每位初学者对“零成本科学上网”的探索诉求。本指南剔除一切含有恶意软件、贩卖隐私日志的野鸡黑产软件，仅收录经过全球安全社区检验的正规合规大厂免费方案，同时用实测数据剖析免费与正规专线的本质差距。
+      </p>
+
+      <!-- Safety Alert Box -->
+      <div class="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 sm:p-6 text-ink">
+        <div class="flex items-start gap-3.5">
+          <span class="text-2xl shrink-0">⚠️</span>
+          <div>
+            <h2 class="text-[16px] font-bold text-amber-900 dark:text-amber-200">
+              安全避坑核心原则：免费是最好的“应急备用”，绝不可作为高频主力
+            </h2>
+            <p class="mt-1.5 text-[14px] text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
+              根据网络安全实验室监测，市面上超过 70% 的所谓“无限制永久免费 VPN”存在静默收集用户上网日志、倒卖数据甚至注入流量劫持脚本的高危行为。切勿在不可信的免费节点中进行网银交易、登录工作邮箱或输入重要账号密码！
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part 1: Genuine Free Tools -->
+  <section class="mx-auto max-w-6xl px-5 py-12">
+    <div class="border-b border-line pb-4 mb-8">
+      <span class="rounded bg-pine/10 px-2.5 py-1 text-[12px] font-bold text-pine font-mono">PART 01</span>
+      <h2 class="mt-2 font-display text-[26px] font-extrabold text-ink">全球知名正规合规免费工具精选</h2>
+      <p class="mt-1 text-[14px] text-muted">均由海外合规大厂或知名安全机构提供，无恶意广告，保障基本隐私</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {FREE_TOOLS.map((tool) => (
+        <article class="flex flex-col justify-between rounded-2xl border border-line bg-paper p-6 transition hover:border-pine hover:shadow-lg">
+          <div>
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="font-display text-[20px] font-bold text-ink">{tool.name}</h3>
+              <span class="rounded-full bg-tile px-2.5 py-0.5 text-[11px] font-semibold text-pine">
+                {tool.tag}
+              </span>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-tile/40 p-3 text-[13px] border border-line/40">
+              <div>
+                <span class="text-muted block text-[11px]">实测速率上限</span>
+                <strong class="font-mono text-ink">{tool.speedRating}</strong>
+              </div>
+              <div>
+                <span class="text-muted block text-[11px]">免费配额限制</span>
+                <strong class="text-pine font-medium">{tool.quota}</strong>
+              </div>
+            </div>
+
+            <!-- Pros & Cons -->
+            <div class="mt-4 space-y-3 text-[13px]">
+              <div>
+                <span class="font-semibold text-emerald-600 dark:text-emerald-400">优点：</span>
+                <ul class="list-disc pl-5 text-muted space-y-0.5 mt-1">
+                  {tool.pros.map((p) => <li>{p}</li>)}
+                </ul>
+              </div>
+              <div>
+                <span class="font-semibold text-rose-500">缺点与局限：</span>
+                <ul class="list-disc pl-5 text-muted space-y-0.5 mt-1">
+                  {tool.cons.map((c) => <li>{c}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-4 rounded-lg bg-tile/60 p-3 text-[12px] text-muted">
+              <strong class="text-ink">上手优化建议：</strong>{tool.guide}
+            </div>
+          </div>
+
+          <div class="mt-6 border-t border-line/60 pt-4">
+            <a
+              href={tool.officialUrl}
+              target="_blank"
+              rel="nofollow noopener"
+              class="block w-full rounded-lg border border-line bg-tile/50 py-2.5 text-center text-[13px] font-semibold text-ink hover:bg-tile transition"
+            >
+              前往官方项目页面 ↗
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Part 2: Free Trial / Daily Check-in Airports -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="border-b border-line pb-4 mb-8">
+        <span class="rounded bg-pine/10 px-2.5 py-1 text-[12px] font-bold text-pine font-mono">PART 02</span>
+        <h2 class="mt-2 font-display text-[26px] font-extrabold text-ink">正规机场免费试用与白嫖流量方案</h2>
+        <p class="mt-1 text-[14px] text-muted">既能白嫖体验正规 IEPL 专线的丝滑速度，又无需承担资金风险</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        {FREE_TRIAL_AIRPORTS.map((airport) => (
+          <div class="flex flex-col justify-between rounded-2xl border border-line bg-paper p-6 transition hover:border-pine/60 hover:shadow-md">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="rounded-lg bg-pine/10 px-2 py-0.5 font-mono text-[12px] font-bold text-pine">
+                  #{airport.rank} 推荐
+                </span>
+                <span class="text-[12px] text-muted">{airport.minPrice}</span>
+              </div>
+              <h3 class="mt-3 font-display text-[20px] font-bold text-ink">{airport.name}</h3>
+              <p class="mt-2 text-[13px] font-medium text-pine bg-pine/5 rounded-md p-2">
+                🎁 {airport.trialPolicy}
+              </p>
+              <p class="mt-3 text-[13px] text-muted leading-relaxed">{airport.feature}</p>
+            </div>
+
+            <div class="mt-6 border-t border-line/60 pt-4">
+              <a
+                href={airport.affUrl}
+                target="_blank"
+                rel="nofollow sponsored noopener"
+                class="block w-full rounded-lg bg-pine py-2.5 text-center text-[13px] font-semibold text-white shadow-sm hover:bg-pine-deep transition"
+              >
+                {airport.coupon ? `领券试用【${airport.coupon}】` : '直达官网开通'}
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Part 3: Shocking Contrast Table -->
+  <section class="mx-auto max-w-6xl px-5 py-12 sm:py-16">
+    <div class="border-b border-line pb-4 mb-8 text-center max-w-3xl mx-auto">
+      <span class="rounded bg-rose-500/10 px-2.5 py-1 text-[12px] font-bold text-rose-600 font-mono">PART 03</span>
+      <h2 class="mt-2 font-display text-[28px] font-extrabold text-ink">
+        【实测对比】免费节点 VS ¥8/月正规专线晚高峰实测反差
+      </h2>
+      <p class="mt-2 text-[15px] text-muted">
+        用真实数据说话。为什么我们强烈建议将免费方案仅作应急，而日常使用花一杯奶茶钱升级专线？
+      </p>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-line bg-paper shadow-sm">
+      <table class="w-full text-left border-collapse text-[14px]">
+        <thead>
+          <tr class="border-b border-line bg-tile/60 text-ink">
+            <th class="p-4 font-bold">评测核心维度</th>
+            <th class="p-4 font-bold text-rose-500">公共免费节点 / 免费梯子</th>
+            <th class="p-4 font-bold text-pine">正规 IEPL 专线 (如光速云 ¥8/月)</th>
+            <th class="p-4 font-bold text-muted hidden sm:table-cell">影响权重</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          {FREE_VS_PAID.map((row) => (
+            <tr class="hover:bg-tile/30 transition">
+              <td class="p-4 font-semibold text-ink">{row.dimension}</td>
+              <td class="p-4 text-muted bg-rose-500/5">{row.freeNode}</td>
+              <td class="p-4 text-pine font-medium bg-pine/5">{row.paidIEPL}</td>
+              <td class="p-4 text-muted text-[12px] hidden sm:table-cell">{row.importance}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Conversion Banner -->
+    <div class="mt-10 rounded-2xl bg-gradient-to-r from-pine/90 to-pine p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <span class="rounded bg-white/20 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider">
+          高性价比上车推荐
+        </span>
+        <h3 class="mt-2 font-display text-[22px] sm:text-[26px] font-extrabold">
+          折合仅需 ¥8/月 · 彻底告别卡顿与断流
+        </h3>
+        <p class="mt-1 text-[14px] text-white/90 max-w-xl">
+          光速云采用双专线热备架构，千兆跑满，原生解锁 ChatGPT 4o 与 Netflix 4K。输入专属折上折优惠码【AMM】即可享受极致体验，支持月付无负担。
+        </p>
+      </div>
+
+      <div class="shrink-0 flex items-center gap-3">
+        <a
+          href="/airports/guangshiyun"
+          class="rounded-lg bg-white/10 border border-white/30 px-5 py-3 text-[14px] font-semibold text-white hover:bg-white/20 transition"
+        >
+          查看光速云测评
+        </a>
+        <a
+          href="https://gscloud.net/#/register?code=AMM"
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          class="rounded-lg bg-white px-6 py-3 text-[14px] font-bold text-pine shadow-lg hover:bg-paper transition"
+        >
+          领券直达官网 →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Part 4: Free FAQ -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl px-5">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-[26px] font-extrabold text-ink">免费资源常见疑问解答</h2>
+      </div>
+
+      <div class="space-y-4">
+        {freeFaqSchema.mainEntity.map((item) => (
+          <div class="rounded-xl border border-line bg-paper p-5">
+            <h3 class="text-[16px] font-bold text-ink">Q：{item.name}</h3>
+            <p class="mt-2 text-[14px] text-muted leading-relaxed">A：{item.acceptedAnswer.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

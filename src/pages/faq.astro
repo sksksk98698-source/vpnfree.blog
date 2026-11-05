@@ -1,23 +1,256 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { FAQ_PAGE as T } from '../constants/pages';
+import { FAQ_DATABASE, FAQ_CATEGORIES } from '../data/faq-database';
+import { SITE } from '../constants/components';
+
+const pageTitle = `翻墙机场与科学上网万字级百科知识库 (80条权威FAQ) — ${SITE.name} (${SITE.enName})`;
+const pageDescription = `中文互联网专著级科学上网百科：涵盖 8 大核心专业维度、80 条深度解答。深入解析 IEPL/IPLC 物理专线、Shadowsocks/VLESS 协议对比、GEO 出口选型、流媒体多国版权解锁、ChatGPT/Claude 原生住宅防封控、客户端分流软路由及资金防跑路避坑指南。`;
+
+// Schema.org FAQPage Structured Data for Rich Snippets
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_DATABASE.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: `${item.answer} ${item.keyTakeaway ? `【核心要点总结】${item.keyTakeaway}` : ''}`,
+    },
+  })),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: '百科FAQ知识库', item: `${SITE.url}/faq` },
+  ],
+};
 ---
 
-<Layout title={T.meta.title} description={T.meta.description}>
-  <section class="mx-auto max-w-3xl px-5 pb-8 sm:pb-16 pt-6 sm:pt-12">
-    <h1 class="font-display text-[clamp(32px,5vw,52px)] font-extrabold tracking-tight">{T.title}</h1>
-    <p class="mt-3 text-[16px] leading-relaxed text-muted" set:html={T.introHtml} />
+<Layout title={pageTitle} description={pageDescription} jsonLd={[breadcrumbSchema, faqSchema]}>
+  <!-- Top Breadcrumb -->
+  <div class="border-b border-line bg-tile/30">
+    <div class="mx-auto max-w-6xl px-5 py-3 text-[13px] text-muted flex items-center justify-between">
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center gap-1.5 flex-wrap">
+          <li><a href="/" class="hover:text-ink">首页</a></li>
+          <li><span>/</span></li>
+          <li class="text-ink font-medium">翻墙机场与科学上网百科知识库 (80 条 FAQ)</li>
+        </ol>
+      </nav>
+      <div class="hidden sm:flex items-center gap-3 text-xs font-mono text-muted">
+        <span>已收录 80 条权威解答</span>
+        <span>•</span>
+        <span class="text-pine font-semibold">Google FAQPage 结构化数据已就绪</span>
+      </div>
+    </div>
+  </div>
 
-    <div class="mt-8 rounded-2xl border border-line bg-tile/40 px-6 sm:px-8">
-      {T.items.map((item) => (
-        <details class="group border-b border-line py-4 last:border-b-0">
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-semibold">
-            {item.q}
-            <span class="shrink-0 text-muted transition group-open:rotate-45">+</span>
-          </summary>
-          <p class="max-w-[62ch] pb-1 pt-2.5 text-[14px] leading-relaxed text-muted">{item.a}</p>
-        </details>
+  <!-- Hero Header -->
+  <section class="border-b border-line bg-paper py-10 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pine/30 bg-pine/10 px-3.5 py-1 text-[12px] font-semibold text-pine">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-pine opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-pine"></span>
+        </span>
+        万字级深度硬核知识库 · 80 条专著级权威解答 · 覆盖 8 大专业维度
+      </div>
+      <h1 class="mt-4 font-display text-[clamp(32px,5vw,50px)] font-extrabold tracking-tight text-ink leading-tight">
+        翻墙机场与科学上网百科知识库 (80 条权威 FAQ)
+      </h1>
+      <p class="mt-3 max-w-3xl text-[16px] text-muted leading-relaxed">
+        由一线网络架构师与资深跨境玩家联合整理的权威选型全书。涵盖概念基础、IEPL 专线原理解析、现代协议抗封锁横评、GEO 出口选型、流媒体多国版权解锁、AI 大模型防封控、客户端分流软路由及资金防跑路指南。解答您在科学上网过程中的一切硬核疑惑。
+      </p>
+
+      <!-- Testing Specs Bar -->
+      <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">问答覆盖规模</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-pine">80 条专著</p>
+          <p class="text-[11px] text-muted">涵盖 8 大核心专业维度</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">有效内容体量</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-ink">1.6 万+ 纯字</p>
+          <p class="text-[11px] text-muted">每题配核心要点与延伸内链</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">实时智能检索</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-emerald-600">毫秒级即搜</p>
+          <p class="text-[11px] text-muted">支持中英双语与标签过滤</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">SEO 富媒体标记</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-pine">FAQPage</p>
+          <p class="text-[11px] text-muted">Google Rich Snippets 规范</p>
+        </div>
+      </div>
+
+      <!-- Search in FAQ -->
+      <div class="mt-8 max-w-2xl">
+        <div class="flex items-center gap-3 rounded-2xl border-2 border-line bg-tile/50 px-4 py-3.5 focus-within:border-pine focus-within:bg-paper focus-within:shadow-md transition">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="text-muted shrink-0">
+            <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            id="faq-search-input"
+            type="search"
+            placeholder="在 80 条百科中搜索（如 IEPL、VLESS、ChatGPT、全红排障、TUN模式）…"
+            class="w-full bg-transparent text-[15px] outline-none placeholder:text-muted text-ink font-medium"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Filter Bar -->
+  <section class="mx-auto max-w-6xl px-5 pt-8">
+    <div class="flex flex-wrap items-center gap-2 border-b border-line pb-4" id="faq-category-buttons">
+      {FAQ_CATEGORIES.map((cat, idx) => (
+        <button
+          type="button"
+          data-category={cat.id}
+          class:list={[
+            'faq-cat-btn rounded-xl px-3.5 py-2 text-[13px] font-semibold transition shadow-sm',
+            idx === 0
+              ? 'bg-pine text-white'
+              : 'border border-line bg-paper text-muted hover:border-pine hover:text-ink'
+          ]}
+        >
+          {cat.name}
+        </button>
       ))}
     </div>
   </section>
+
+  <!-- FAQ Accordion List -->
+  <section class="mx-auto max-w-6xl px-5 py-8 sm:py-12">
+    <div class="space-y-4" id="faq-list">
+      {FAQ_DATABASE.map((item) => (
+        <details
+          class="faq-item group rounded-2xl border border-line bg-paper p-5 sm:p-6 transition hover:border-pine/60 hover:shadow-md open:border-pine/50 open:bg-tile/20"
+          data-category={item.category}
+          data-keywords={`${item.num} ${item.question} ${item.answer} ${item.keyTakeaway || ''} ${item.categoryTag}`.toLowerCase()}
+        >
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] sm:text-[17px] font-bold text-ink select-none">
+            <span class="flex items-start sm:items-center gap-2.5 flex-wrap sm:flex-nowrap">
+              <span class="flex items-center gap-1.5 shrink-0">
+                <span class="rounded-lg bg-pine px-2 py-0.5 text-[12px] font-mono font-bold text-white shadow-sm">
+                  {item.num}
+                </span>
+                <span class="rounded bg-tile px-2 py-0.5 text-[11px] font-medium text-muted">
+                  {item.categoryTag}
+                </span>
+              </span>
+              <span class="leading-snug">{item.question}</span>
+            </span>
+            <span class="shrink-0 text-muted transition duration-200 group-open:rotate-45 text-2xl font-light">
+              +
+            </span>
+          </summary>
+
+          <div class="mt-4 border-t border-line/60 pt-4 text-[15px] leading-relaxed text-muted space-y-3.5">
+            <p class="text-ink/85">{item.answer}</p>
+
+            {item.keyTakeaway && (
+              <div class="rounded-xl border border-pine/30 bg-pine/5 p-3.5 text-[13px] leading-relaxed">
+                <strong class="text-pine font-bold">💡 核心要点总结：</strong>
+                <span class="text-ink font-medium">{item.keyTakeaway}</span>
+              </div>
+            )}
+
+            {item.relatedLinks && item.relatedLinks.length > 0 && (
+              <div class="flex items-center gap-2 pt-1 text-[13px] flex-wrap">
+                <span class="text-muted">🔗 相关延伸阅读：</span>
+                {item.relatedLinks.map((link) => (
+                  <a href={link.href} class="text-pine underline underline-offset-2 hover:opacity-85 font-semibold">
+                    {link.label} &rarr;
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </details>
+      ))}
+    </div>
+
+    <!-- Empty Search State -->
+    <div id="faq-empty" class="hidden py-16 text-center text-muted rounded-2xl border border-line bg-tile/30">
+      <p class="text-4xl">🔍</p>
+      <p class="mt-3 text-[18px] font-bold text-ink">未找到匹配的百科问答</p>
+      <p class="text-[14px] mt-1 text-muted">尝试搜索“IEPL”、“ChatGPT”、“全红”、“小火箭”或“软路由”</p>
+    </div>
+  </section>
+
+  <!-- Cross Navigation Hub -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-5 text-center">
+      <h2 class="font-display text-[26px] font-extrabold text-ink">仍然有技术疑问或发现异常？</h2>
+      <p class="mt-2 text-[15px] text-muted max-w-xl mx-auto">
+        欢迎查阅本站真实晚高峰测速实验室、避坑雷达，或者向评测实验室直接提交工单反馈。
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <a href="/speedtest" class="rounded-xl bg-pine px-6 py-3 text-[14px] font-semibold text-white hover:bg-pine-deep transition shadow-sm">
+          前往晚高峰测速实验室
+        </a>
+        <a href="/radar" class="rounded-xl border border-line bg-paper px-6 py-3 text-[14px] font-semibold text-ink hover:bg-tile transition shadow-sm">
+          查看机场跑路避坑雷达
+        </a>
+        <a href="/topics" class="rounded-xl border border-line bg-paper px-6 py-3 text-[14px] font-semibold text-ink hover:bg-tile transition shadow-sm">
+          GEO 专线选型全书
+        </a>
+        <a href="/contacts" class="rounded-xl border border-line bg-paper px-6 py-3 text-[14px] font-semibold text-ink hover:bg-tile transition shadow-sm">
+          向评测组提交技术反馈
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const catBtns = document.querySelectorAll<HTMLButtonElement>('.faq-cat-btn');
+    const faqItems = document.querySelectorAll<HTMLElement>('.faq-item');
+    const searchInput = document.getElementById('faq-search-input') as HTMLInputElement;
+    const emptyState = document.getElementById('faq-empty')!;
+
+    let currentCat = 'all';
+
+    function filterFAQ() {
+      const q = searchInput?.value.trim().toLowerCase() || '';
+      let visibleCount = 0;
+
+      faqItems.forEach((item) => {
+        const matchCat = currentCat === 'all' || item.dataset.category === currentCat;
+        const matchSearch = !q || (item.dataset.keywords || '').includes(q);
+
+        if (matchCat && matchSearch) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      emptyState.classList.toggle('hidden', visibleCount > 0);
+    }
+
+    catBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        catBtns.forEach((b) => {
+          b.classList.remove('bg-pine', 'text-white');
+          b.classList.add('border', 'border-line', 'bg-paper', 'text-muted');
+        });
+        btn.classList.add('bg-pine', 'text-white');
+        btn.classList.remove('border', 'border-line', 'bg-paper', 'text-muted');
+
+        currentCat = btn.getAttribute('data-category') || 'all';
+        filterFAQ();
+      });
+    });
+
+    searchInput?.addEventListener('input', filterFAQ);
+  </script>
 </Layout>

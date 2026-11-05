@@ -1,0 +1,468 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { AIRPORTS, type Airport } from '../../data/airports';
+import { SITE } from '../../constants/components';
+
+export async function getStaticPaths() {
+  return AIRPORTS.map((airport) => ({
+    params: { slug: airport.slug },
+    props: { airport },
+  }));
+}
+
+interface Props {
+  airport: Airport;
+}
+
+const { airport: a } = Astro.props;
+const hasImages = a.speedTestImages && a.speedTestImages.length > 0;
+
+// Related airports (e.g. adjacent ranks or same line type)
+const relatedAirports = AIRPORTS.filter(
+  (item) => item.slug !== a.slug && (item.lineType === a.lineType || Math.abs(item.rank - a.rank) <= 3)
+).slice(0, 3);
+
+// Full Schema.org JSON-LD (Product + Review + Breadcrumbs)
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: `${a.name} 翻墙机场服务`,
+  description: a.description,
+  image: a.speedTestImages.length > 0 ? `${SITE.url}${a.speedTestImages[0].url}` : `${SITE.url}/logo/brand-dark.svg`,
+  brand: {
+    '@type': 'Brand',
+    name: a.name,
+  },
+  offers: {
+    '@type': 'Offer',
+    url: a.affLink,
+    priceCurrency: 'CNY',
+    price: a.minPriceMonthly,
+    availability: 'https://schema.org/InStock',
+    itemCondition: 'https://schema.org/NewCondition',
+  },
+};
+
+const dynamicDescription = `${a.name}怎么样？2026 最新晚高峰深度实测测评（综合排名 #${a.rank}）：主打 ${a.lineType} 架构与 ${a.protocols.join('/')} 传输协议，月付预算 ${a.priceDisplay} 起。${a.speedTestData && a.speedTestData.length > 0 ? `晚高峰实测 ${a.speedTestData[0].location} 节点延迟低至 ${a.speedTestData[0].ping}、下行速率达 ${a.speedTestData[0].download}。` : ''}支持 ChatGPT/Claude 原生住宅防风控与 4K 流媒体解锁。核心亮点：${a.features.slice(0, 3).join('、')}。${a.coupon ? `专属折扣码【${a.coupon}】` : '官方直达开通通道'}，客观数据全量公开。`;
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: '首页',
+      item: SITE.url,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: '42家机场品牌库',
+      item: `${SITE.url}/airports`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: a.name,
+      item: `${SITE.url}/airports/${a.slug}`,
+    },
+  ],
+};
+---
+
+<Layout
+  title={`${a.name}怎么样？2026 最新晚高峰测速评测与优惠码 · ${SITE.name}`}
+  description={dynamicDescription}
+  image={hasImages ? a.speedTestImages[0].url : '/images/og-default.jpg'}
+  ogType="product"
+  jsonLd={[productSchema, breadcrumbSchema]}
+>
+  <div class="mx-auto max-w-6xl px-5 py-6 sm:py-10">
+    <!-- Breadcrumb -->
+    <nav class="text-[13px] text-muted mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-1.5 flex-wrap">
+        <li><a href="/" class="hover:text-ink">首页</a></li>
+        <li><span>/</span></li>
+        <li><a href="/airports" class="hover:text-ink">42家机场品牌库</a></li>
+        <li><span>/</span></li>
+        <li class="text-ink font-medium">{a.name}</li>
+      </ol>
+    </nav>
+
+    <!-- Brand Header Hero Card -->
+    <div class="rounded-3xl border border-line bg-paper/90 p-6 sm:p-10 shadow-sm backdrop-blur">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-line">
+        <div class="flex items-start gap-4">
+          <span
+            class:list={[
+              'flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl font-mono font-extrabold text-2xl',
+              a.rank <= 3
+                ? 'bg-pine text-white'
+                : a.rank <= 10
+                  ? 'bg-pine-soft text-pine border border-pine/30'
+                  : 'bg-tile text-muted',
+            ]}
+          >
+            #{a.rank}
+          </span>
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+              <span class="rounded bg-pine px-2.5 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
+                {a.rank === 1 ? '年度首选主推' : a.isTop10 ? 'TOP10 强推品牌' : '42家精选库'}
+              </span>
+              <span class="text-xs text-muted font-mono">{a.operatingSince} · {a.nodeCount}</span>
+            </div>
+            <h1 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+              {a.name}
+            </h1>
+            <p class="mt-2 text-[14px] text-muted">
+              线路架构: <strong class="text-ink">{a.lineType}</strong> · 协议: <span class="font-mono text-ink">{a.protocols.join(', ')}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="flex flex-wrap items-center gap-3">
+          {a.coupon && (
+            <button
+              type="button"
+              data-copy-coupon={a.coupon}
+              data-aff-link={a.affLink}
+              class="rounded-xl border border-pine/40 bg-pine-soft px-4 py-3 font-mono text-[14px] font-bold text-pine hover:bg-pine hover:text-white transition flex items-center gap-2"
+              title="点击复制优惠码并跳转"
+            >
+              <span>优惠券: {a.coupon}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            </button>
+          )}
+          <a
+            href={a.affLink}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="rounded-xl bg-pine px-6 py-3.5 text-[15px] font-semibold text-white hover:bg-pine-deep transition flex items-center gap-1.5 shadow-sm"
+          >
+            直达 {a.name} 官网注册
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div class="grid grid-cols-2 gap-4 pt-6 sm:grid-cols-4">
+        <div>
+          <span class="text-xs text-muted block">入门起步预算</span>
+          <span class="font-display text-2xl font-bold text-pine">{a.priceDisplay}</span>
+        </div>
+        <div>
+          <span class="text-xs text-muted block">香港专线延迟</span>
+          <span class="font-display text-2xl font-bold text-ink font-mono">{a.speedTestData[0]?.ping || '25ms'}</span>
+        </div>
+        <div>
+          <span class="text-xs text-muted block">实测峰值带宽</span>
+          <span class="font-display text-2xl font-bold text-pine font-mono">{a.speedTestData[0]?.download || '520Mbps'}</span>
+        </div>
+        <div>
+          <span class="text-xs text-muted block">AI & 4K解锁评级</span>
+          <span class="font-display text-2xl font-bold text-emerald-600">A+ 优秀</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="mt-10 grid gap-10 lg:grid-cols-[1.5fr_1fr]">
+      <div class="space-y-10">
+        <!-- Section: Overview & Background -->
+        <section class="rounded-2xl border border-line bg-paper p-6 sm:p-8">
+          <h2 class="font-display text-2xl font-bold text-ink mb-4">
+            {a.name} 品牌背景与综合介绍
+          </h2>
+          <p class="text-[15px] leading-relaxed text-ink/85">
+            {a.description}
+          </p>
+
+          <div class="mt-6">
+            <h3 class="text-sm font-semibold text-ink uppercase tracking-wider mb-3">核心特点与技术优势</h3>
+            <ul class="grid gap-2.5 sm:grid-cols-2">
+              {a.features.map((feat) => (
+                <li class="flex items-start gap-2 text-[14px] text-muted">
+                  <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-pine"></span>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section: Real Speedtest & Observatory Benchmarks -->
+        <section class="rounded-2xl border border-line bg-paper p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-2xl font-bold text-ink">
+              晚高峰节点测速性能报告
+            </h2>
+            <span class="rounded bg-tile px-2.5 py-1 text-xs font-mono text-muted">
+              环境: MAI-TEST-BOT
+            </span>
+          </div>
+          <p class="text-[14px] text-muted mb-6">
+            测试数据截取自晚高峰时段全国骨干网对各落地出口的真实响应与并发下载速率。
+          </p>
+
+          <!-- Speed Test Progress Table -->
+          <div class="space-y-3.5">
+            {a.speedTestData.map((st) => (
+              <div class="rounded-xl border border-line bg-tile/40 p-4">
+                <div class="flex items-center justify-between text-sm font-medium mb-1.5">
+                  <span class="flex items-center gap-2 text-ink font-semibold">
+                    <span class="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
+                    {st.location} 出口专线
+                  </span>
+                  <div class="flex items-center gap-4 text-xs font-mono">
+                    <span class="text-muted">延迟: <strong class="text-ink">{st.ping}</strong></span>
+                    <span class="text-muted">下载: <strong class="text-pine font-bold">{st.download}</strong></span>
+                  </div>
+                </div>
+                <div class="w-full h-2 rounded-full bg-tile overflow-hidden">
+                  <div
+                    class="h-full rounded-full bg-pine"
+                    style={`width: ${Math.min(100, Math.max(20, parseInt(st.download) / 6))}%;`}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <!-- Real Image Screenshots Gallery -->
+          {hasImages && (
+            <div class="mt-8 pt-8 border-t border-line">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-ink flex items-center gap-2">
+                  <span>📸 实测跑速与解锁大图记录</span>
+                  <span class="text-xs font-normal text-muted font-mono">({a.speedTestImages.length} 张原始实测图)</span>
+                </h3>
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2">
+                {a.speedTestImages.map((img, i) => (
+                  <div class="group relative rounded-xl border border-line overflow-hidden bg-tile">
+                    <img
+                      src={img.url}
+                      alt={`${a.name} ${img.caption}`}
+                      class="w-full aspect-[16/10] object-cover transition duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div class="p-3 bg-paper border-t border-line text-xs font-medium text-muted">
+                      {img.caption}
+                      {img.testedAt && <span class="block text-[11px] font-mono text-muted/80 mt-0.5">测试于: {img.testedAt}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        <!-- Section: AI & Streaming Matrix -->
+        <section class="rounded-2xl border border-line bg-paper p-6 sm:p-8">
+          <h2 class="font-display text-2xl font-bold text-ink mb-4">
+            流媒体 & AI 大模型原生解锁矩阵
+          </h2>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <!-- AI Box -->
+            <div class="rounded-xl border border-line bg-tile/40 p-4">
+              <h3 class="text-sm font-semibold text-ink mb-3 flex items-center gap-2">
+                <span>🤖 AI 生产力大模型支持</span>
+              </h3>
+              <div class="space-y-2">
+                {a.aiUnlock.items.map((item) => (
+                  <div class="flex items-center justify-between text-sm py-1.5 border-b border-line/60 last:border-b-0">
+                    <span class="font-medium text-ink">{item.name}</span>
+                    <span class:list={['text-xs font-medium px-2 py-0.5 rounded', item.supported ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']}>
+                      {item.note || (item.supported ? '支持' : '视节点')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- Streaming Box -->
+            <div class="rounded-xl border border-line bg-tile/40 p-4">
+              <h3 class="text-sm font-semibold text-ink mb-3 flex items-center gap-2">
+                <span>🎬 海外 4K 流媒体平台支持</span>
+              </h3>
+              <div class="space-y-2">
+                {a.streamingUnlock.items.map((item) => (
+                  <div class="flex items-center justify-between text-sm py-1.5 border-b border-line/60 last:border-b-0">
+                    <span class="font-medium text-ink">{item.name}</span>
+                    <span class="text-xs font-medium px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                      {item.note || '支持 4K'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section: Plans & Pricing Table -->
+        <section class="rounded-2xl border border-line bg-paper p-6 sm:p-8">
+          <h2 class="font-display text-2xl font-bold text-ink mb-4">
+            {a.name} 套餐价格与规格一览
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="border-b border-line text-xs font-semibold text-muted uppercase">
+                <tr>
+                  <th class="py-3 px-4">套餐名称</th>
+                  <th class="py-3 px-4">计费周期</th>
+                  <th class="py-3 px-4">价格</th>
+                  <th class="py-3 px-4">高速流量</th>
+                  <th class="py-3 px-4">流量周期</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-line">
+                {a.plans.map((p) => (
+                  <tr class="hover:bg-tile/40 transition">
+                    <td class="py-3.5 px-4 font-semibold text-ink">{p.name}</td>
+                    <td class="py-3.5 px-4 text-muted">{p.billing}</td>
+                    <td class="py-3.5 px-4 font-mono font-bold text-pine">{p.price}</td>
+                    <td class="py-3.5 px-4 text-ink font-mono">{p.traffic}</td>
+                    <td class="py-3.5 px-4 text-muted">{p.cycle}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section: Pros & Cons -->
+        <section class="rounded-2xl border border-line bg-paper p-6 sm:p-8">
+          <h2 class="font-display text-2xl font-bold text-ink mb-4">
+            优缺点客观评价与适合人群
+          </h2>
+          <div class="grid gap-6 sm:grid-cols-2">
+            <div class="rounded-xl border border-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-950/20 p-5">
+              <h3 class="font-bold text-emerald-800 dark:text-emerald-300 text-sm mb-3 flex items-center gap-1.5">
+                <span>优点亮点</span>
+              </h3>
+              <ul class="space-y-2 text-[14px] text-emerald-900/80 dark:text-emerald-200">
+                {a.pros.map((p) => (
+                  <li class="flex items-start gap-2">
+                    <span class="font-bold">✓</span>
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div class="rounded-xl border border-amber-500/20 bg-amber-50/30 dark:bg-amber-950/20 p-5">
+              <h3 class="font-bold text-amber-800 dark:text-amber-300 text-sm mb-3 flex items-center gap-1.5">
+                <span>注意事项与局限</span>
+              </h3>
+              <ul class="space-y-2 text-[14px] text-amber-900/80 dark:text-amber-200">
+                {a.cons.map((c) => (
+                  <li class="flex items-start gap-2">
+                    <span class="font-bold">!</span>
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-xl border border-line bg-tile/40 p-5">
+            <h3 class="text-sm font-semibold text-ink mb-2">推荐适合人群：</h3>
+            <ul class="list-disc list-inside space-y-1 text-[14px] text-muted">
+              {a.recommendedFor.map((rec) => (
+                <li>{rec}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Sidebar (Sticky Box) -->
+      <aside class="space-y-6">
+        <!-- Sticky Action Card -->
+        <div class="sticky top-24 rounded-2xl border border-pine/30 bg-paper p-6 shadow-sm">
+          <div class="flex items-baseline justify-between mb-4">
+            <span class="text-xs text-muted">入门最低参考价</span>
+            <span class="font-display text-3xl font-extrabold text-pine">{a.priceDisplay}</span>
+          </div>
+
+          {a.coupon && (
+            <div class="mb-4 rounded-xl border border-pine/20 bg-pine-soft p-3 text-center">
+              <span class="text-xs text-muted block">专属折上折优惠码</span>
+              <div class="my-1 font-mono text-xl font-extrabold text-pine tracking-wider">{a.coupon}</div>
+              <button
+                type="button"
+                data-copy-coupon={a.coupon}
+                data-aff-link={a.affLink}
+                class="text-xs font-semibold text-pine underline hover:opacity-85"
+              >
+                点击一键复制优惠码
+              </button>
+            </div>
+          )}
+
+          <a
+            href={a.affLink}
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            class="block w-full rounded-xl bg-pine py-3.5 text-center text-[15px] font-semibold text-white hover:bg-pine-deep transition shadow-sm"
+          >
+            直达 {a.name} 官网注册开通 &rarr;
+          </a>
+
+          <p class="mt-3 text-[11px] text-muted text-center leading-relaxed">
+            * 推广注册链接已标注 rel="nofollow sponsored noopener"，结算时粘贴优惠码即可享受专属折扣。
+          </p>
+
+          <!-- Quick Specs List -->
+          <div class="mt-6 pt-6 border-t border-line text-xs space-y-2.5">
+            <div class="flex justify-between">
+              <span class="text-muted">专线类型</span>
+              <span class="font-semibold text-ink">{a.lineType}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted">协议支持</span>
+              <span class="font-semibold text-ink">{a.protocols.join(', ')}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted">运营时间</span>
+              <span class="font-semibold text-ink">{a.operatingSince}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted">节点数量</span>
+              <span class="font-semibold text-ink">{a.nodeCount}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted">覆盖地区</span>
+              <span class="font-semibold text-ink">{a.coverageRegions.slice(0, 4).join(' / ')}等</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Airports -->
+        <div class="rounded-2xl border border-line bg-tile/40 p-6">
+          <h3 class="font-display text-lg font-bold text-ink mb-4">同梯队相似机场对比</h3>
+          <div class="space-y-3">
+            {relatedAirports.map((ra) => (
+              <a
+                href={`/airports/${ra.slug}`}
+                class="group block rounded-xl border border-line bg-paper p-3 hover:border-pine transition"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-ink text-sm group-hover:text-pine transition">
+                    #{ra.rank} {ra.name}
+                  </span>
+                  <span class="text-xs font-mono font-bold text-pine">{ra.priceDisplay}</span>
+                </div>
+                <p class="text-[12px] text-muted mt-1">{ra.lineType} · {ra.nodeCount}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Layout>

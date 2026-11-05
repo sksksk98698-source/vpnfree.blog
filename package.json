@@ -1,30 +1,17 @@
 {
-  "name": "astro-njx-store",
+  "name": "vpnfree-blog",
   "type": "module",
-  "version": "0.1.0",
-  "description": "Ecommerce storefront starter: Astro + Tailwind v4 — works out of the box with mock data, connects to Shopify Storefront API with two env vars.",
+  "version": "1.0.0",
+  "description": "VPN免费 (vpnfree.blog) — 2026 翻墙机场与VPN推荐 · 42家品牌晚高峰测速实验室",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "dev": "astro dev --ignore-lock",
+    "build": "astro build && node scripts/sync-sitemap.cjs",
+    "preview": "astro preview",
+    "build:data": "node scripts/build-airport-data.cjs"
   },
-  "keywords": [
-    "astro",
-    "astro-theme",
-    "ecommerce",
-    "shopify",
-    "storefront",
-    "headless",
-    "tailwindcss"
-  ],
-  "license": "MIT",
-  "homepage": "https://astro-njx-store.pages.dev",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/njbSaab/astro-njx-store.git"
-  },
-  "author": "njbSaab (https://njxui.dev)",
+  "license": "UNLICENSED",
   "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
     "@nanostores/persistent": "^0.10.0",
     "@tailwindcss/vite": "^4.0.0",
     "astro": "^7.3.3",

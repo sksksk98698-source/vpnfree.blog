@@ -1,0 +1,29 @@
+# robots.txt for https://vpnfree.blog/
+# Last Updated: 2026-11-05
+# Search Engine Friendly: Google, Bing, Baidu, Shenma (Yisou)
+
+User-agent: *
+Allow: /
+# 屏蔽对外商业跳转与防风控中转目录（保护抓取配额，防止外链爬虫连坐）
+Disallow: /go/
+
+# 专门针对神马搜索（UC/夸克）、百度、必应、谷歌爬虫的兼容保障
+User-agent: Googlebot
+Allow: /
+Disallow: /go/
+
+User-agent: bingbot
+Allow: /
+Disallow: /go/
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /go/
+
+User-agent: yisouspider
+Allow: /
+Disallow: /go/
+
+# Sitemap 权威声明（支持 index 索引格式与单文件 urlset 格式）
+Sitemap: https://vpnfree.blog/sitemap-index.xml
+Sitemap: https://vpnfree.blog/sitemap.xml

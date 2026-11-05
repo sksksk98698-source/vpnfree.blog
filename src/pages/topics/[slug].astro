@@ -1,0 +1,188 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AirportCard from '../../components/AirportCard.astro';
+import { TOPICS, type Topic } from '../../data/topics';
+import { AIRPORTS, type Airport } from '../../data/airports';
+import { SITE } from '../../constants/components';
+
+export async function getStaticPaths() {
+  return TOPICS.map((topic) => ({
+    params: { slug: topic.slug },
+    props: { topic },
+  }));
+}
+
+interface Props {
+  topic: Topic;
+}
+
+const { topic } = Astro.props;
+
+// Get matching airports and sort by rank
+const matchedAirports = AIRPORTS.filter((a) => topic.matchingAirportIds.includes(a.id)).sort(
+  (a, b) => a.rank - b.rank,
+);
+
+// Other topics for cross linking
+const otherTopics = TOPICS.filter((t) => t.slug !== topic.slug);
+
+// Rich SEO Schemas
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: '专线专题', item: `${SITE.url}/topics` },
+    { '@type': 'ListItem', position: 3, name: topic.title, item: `${SITE.url}/topics/${topic.slug}` },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: topic.faq.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+---
+
+<Layout
+  title={`${topic.metaTitle} — ${SITE.name}`}
+  description={topic.metaDescription}
+  jsonLd={[breadcrumbSchema, faqSchema]}
+>
+  <!-- Top Breadcrumb -->
+  <div class="border-b border-line bg-tile/30">
+    <div class="mx-auto max-w-6xl px-5 py-3 text-[13px] text-muted">
+      <a href="/" class="hover:text-ink">首页</a>
+      <span class="mx-2">/</span>
+      <a href="/topics" class="hover:text-ink">专线专题</a>
+      <span class="mx-2">/</span>
+      <span class="text-ink font-medium">{topic.title}</span>
+    </div>
+  </div>
+
+  <!-- Hero Header -->
+  <section class="border-b border-line bg-paper py-10 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pine/30 bg-pine/10 px-3.5 py-1 text-[12px] font-semibold text-pine">
+        <span>{topic.icon}</span>
+        <span>{topic.badge} 深度专题</span>
+      </div>
+
+      <h1 class="mt-4 font-display text-[clamp(30px,4.5vw,48px)] font-extrabold tracking-tight text-ink leading-tight">
+        {topic.heroHeadline}
+      </h1>
+      <p class="mt-3 max-w-3xl text-[16px] text-muted leading-relaxed">
+        {topic.heroDescription}
+      </p>
+
+      <!-- Key Features Trio -->
+      <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {topic.keyFeatures.map((feat) => (
+          <div class="rounded-xl border border-line bg-tile/50 p-4">
+            <h3 class="text-[15px] font-bold text-ink flex items-center gap-2">
+              <span class="text-pine">✓</span>
+              <span>{feat.title}</span>
+            </h3>
+            <p class="mt-1 text-[13px] text-muted leading-relaxed">{feat.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Curated Airport Cards Section -->
+  <section class="mx-auto max-w-6xl px-5 py-12">
+    <div class="flex items-center justify-between border-b border-line pb-4 mb-8">
+      <div>
+        <h2 class="font-display text-[22px] sm:text-[26px] font-bold text-ink">
+          精选入围品牌 ({matchedAirports.length} 家)
+        </h2>
+        <p class="mt-1 text-[13px] text-muted">按综合稳定性、延迟评分与性价比排序推荐</p>
+      </div>
+
+      <div class="text-[13px] text-muted hidden sm:block">
+        支持一键复制独家折扣码
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {matchedAirports.map((airport) => (
+        <AirportCard airport={airport} />
+      ))}
+    </div>
+  </section>
+
+  <!-- Scenario Buying Guide -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-5">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-[24px] sm:text-[28px] font-bold text-ink">
+          {topic.title} 专属选型与避坑指引
+        </h2>
+        <p class="mt-2 text-[14px] text-muted">测试团队根据一线经验为您总结的核心步骤</p>
+      </div>
+
+      <div class="space-y-4">
+        {topic.buyingGuide.map((guide, idx) => (
+          <div class="rounded-xl border border-line bg-paper p-5 sm:p-6 flex items-start gap-4">
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-pine text-[14px] font-bold text-white font-mono">
+              {idx + 1}
+            </span>
+            <div>
+              <h3 class="text-[16px] font-bold text-ink">{guide.step}</h3>
+              <p class="mt-1.5 text-[14px] text-muted leading-relaxed">{guide.content}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Topic FAQ Section -->
+  <section class="border-t border-line bg-paper py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl px-5">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-[24px] sm:text-[28px] font-bold text-ink">
+          {topic.title} 常见疑问解答
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+        {topic.faq.map((item) => (
+          <div class="rounded-xl border border-line bg-tile/40 p-5">
+            <h3 class="text-[16px] font-bold text-ink">Q：{item.q}</h3>
+            <p class="mt-2 text-[14px] text-muted leading-relaxed">A：{item.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Other Topics Navigation -->
+  <section class="border-t border-line bg-tile/20 py-10 sm:py-14">
+    <div class="mx-auto max-w-6xl px-5">
+      <h2 class="font-display text-[20px] font-bold text-ink mb-6">浏览其他场景专题</h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {otherTopics.map((other) => (
+          <a
+            href={`/topics/${other.slug}`}
+            class="group rounded-xl border border-line bg-paper p-4 transition-all hover:border-pine hover:shadow-md"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-xl">{other.icon}</span>
+              <h3 class="text-[15px] font-bold text-ink group-hover:text-pine transition">{other.title}</h3>
+            </div>
+            <p class="mt-1.5 text-[12px] text-muted line-clamp-2">{other.subtitle}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

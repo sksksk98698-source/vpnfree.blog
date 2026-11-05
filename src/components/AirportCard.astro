@@ -1,0 +1,141 @@
+---
+import type { Airport } from '../data/airports';
+
+interface Props {
+  airport: Airport;
+  featured?: boolean;
+}
+
+const { airport: a, featured = false } = Astro.props;
+const hasImages = a.speedTestImages && a.speedTestImages.length > 0;
+---
+
+<div
+  class:list={[
+    'relative flex flex-col justify-between rounded-2xl border transition duration-200 bg-paper/90 backdrop-blur overflow-hidden group',
+    featured
+      ? 'border-pine shadow-md ring-1 ring-pine/20'
+      : 'border-line hover:border-ink hover:shadow-sm',
+  ]}
+  data-card
+  data-price={a.minPriceMonthly}
+  data-rank={a.rank}
+  data-line={a.lineType}
+  data-tags={a.tags.join(',')}
+  data-title={a.name}
+>
+  <!-- Card Header -->
+  <div class="p-5 sm:p-6">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span
+          class:list={[
+            'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-mono font-bold text-sm',
+            a.rank <= 3
+              ? 'bg-pine text-white'
+              : a.rank <= 10
+                ? 'bg-pine/10 text-pine border border-pine/20'
+                : 'bg-tile text-muted',
+          ]}
+        >
+          #{a.rank}
+        </span>
+        <div>
+          <h3 class="font-display text-xl font-bold tracking-tight text-ink group-hover:text-pine transition">
+            <a href={`/airports/${a.slug}`}>{a.name}</a>
+          </h3>
+          <p class="text-[12px] text-muted font-mono">{a.operatingSince} · {a.nodeCount}</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        data-fav-toggle={a.slug}
+        class="rounded-lg p-2 text-muted hover:bg-tile hover:text-pine transition"
+        aria-label={`收藏 ${a.name}`}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20.5c-5.5-3.6-8.5-6.9-8.5-10.4A4.6 4.6 0 0 1 8.1 5.4c1.6 0 3 .8 3.9 2.1a4.7 4.7 0 0 1 3.9-2.1 4.6 4.6 0 0 1 4.6 4.7c0 3.5-3 6.8-8.5 10.4z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Tags Row -->
+    <div class="mt-3.5 flex flex-wrap gap-1.5 text-[11px] font-medium">
+      <span class="rounded bg-pine-soft px-2 py-0.5 text-pine font-semibold">{a.lineType}</span>
+      {a.protocols.slice(0, 2).map((proto) => (
+        <span class="rounded bg-tile px-2 py-0.5 text-muted">{proto}</span>
+      ))}
+      {hasImages && (
+        <span class="rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 px-2 py-0.5 border border-emerald-500/20 flex items-center gap-1">
+          <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          实测图×{a.speedTestImages.length}
+        </span>
+      )}
+    </div>
+
+    <!-- Description -->
+    <p class="mt-3 text-[13px] leading-relaxed text-muted line-clamp-2">
+      {a.description}
+    </p>
+
+    <!-- Speed & Unlock Mini Matrix -->
+    <div class="mt-4 rounded-xl border border-line bg-tile/40 p-3 space-y-2">
+      <div class="flex items-center justify-between text-[12px]">
+        <span class="text-muted">实测延迟 (香港)</span>
+        <span class="font-mono font-semibold text-ink">{a.speedTestData[0]?.ping || '28ms'}</span>
+      </div>
+      <div class="flex items-center justify-between text-[12px]">
+        <span class="text-muted">最高下载带宽</span>
+        <span class="font-mono font-semibold text-pine">{a.speedTestData[0]?.download || '480Mbps'}</span>
+      </div>
+      <div class="flex items-center justify-between text-[12px] pt-1 border-t border-line/60">
+        <span class="text-muted">AI & 流媒体解锁</span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[11px] font-mono rounded bg-paper px-1.5 py-0.5 text-ink">GPT-4o ✓</span>
+          <span class="text-[11px] font-mono rounded bg-paper px-1.5 py-0.5 text-ink">4K 奈飞 ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="border-t border-line bg-tile/30 p-5 sm:p-6 pt-4 flex flex-col gap-3">
+    <div class="flex items-baseline justify-between">
+      <div>
+        <span class="text-[11px] text-muted">入门起步价</span>
+        <div class="font-display text-2xl font-bold text-pine">{a.priceDisplay}</div>
+      </div>
+      {a.coupon && (
+        <button
+          type="button"
+          data-copy-coupon={a.coupon}
+          data-aff-link={a.affLink}
+          class="flex items-center gap-1 rounded-md border border-pine/30 bg-pine/5 px-2.5 py-1 text-[12px] font-mono text-pine hover:bg-pine hover:text-white transition"
+          title="点击复制优惠码并前往官网"
+        >
+          <span>券: {a.coupon}</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        </button>
+      )}
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mt-1">
+      <a
+        href={`/airports/${a.slug}`}
+        class="rounded-lg border border-line py-2.5 text-center text-[13px] font-medium text-ink hover:bg-tile transition"
+      >
+        详细评测
+      </a>
+      <a
+        href={a.affLink}
+        target="_blank"
+        rel="nofollow sponsored noopener"
+        class="rounded-lg bg-pine py-2.5 text-center text-[13px] font-semibold text-white hover:bg-pine-deep transition flex items-center justify-center gap-1"
+      >
+        直达官网
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+      </a>
+    </div>
+  </div>
+</div>

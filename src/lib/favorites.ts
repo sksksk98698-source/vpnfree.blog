@@ -1,9 +1,9 @@
 /**
- * Favorites on nanostores (persisted to localStorage) — stores product handles.
+ * Saved wishlist favorites powered by nanostores and localStorage persistence.
  */
 import { persistentAtom } from '@nanostores/persistent';
 
-export const favorites = persistentAtom<string[]>('njx-shop-favs', [], {
+export const favorites = persistentAtom<string[]>('store-favorites-v1', [], {
   encode: JSON.stringify,
   decode: JSON.parse,
 });

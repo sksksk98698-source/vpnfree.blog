@@ -1,0 +1,153 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AirportCard from '../../components/AirportCard.astro';
+import { AIRPORTS } from '../../data/airports';
+import { SITE } from '../../constants/components';
+
+const filterTags = [
+  { label: '全部品牌 (42)', value: '' },
+  { label: 'TOP 10 强推', value: 'TOP10强推' },
+  { label: 'IEPL专线', value: 'IEPL专线' },
+  { label: 'IPLC专线', value: 'IPLC专线' },
+  { label: '极致平价 (≤8元)', value: '极致平价' },
+  { label: '附实测图 (18)', value: '附实测图' },
+  { label: 'VLESS 协议', value: 'VLESS' },
+];
+
+const directorySchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `42家翻墙机场品牌库 — ${SITE.name}`,
+  description: '收录并实测 42 家主流翻墙机场，提供专线类型、传输协议、晚高峰跑速及优惠码一站式筛选对比。',
+  url: `${SITE.url}/airports`,
+};
+---
+
+<Layout
+  title={`42家翻墙机场品牌库筛选 — 2026 最新测速与优惠码 · ${SITE.name}`}
+  description="全网最全 42 家翻墙机场深度数据库。按 IEPL/IPLC 专线、VLESS 协议、5.6元~20元价格区间、ChatGPT流媒体解锁能力多维筛选，实时直达官方并自动复制专属折扣码。"
+  jsonLd={directorySchema}
+>
+  <section class="mx-auto max-w-6xl px-5 pt-8 pb-4">
+    <!-- Breadcrumb -->
+    <nav class="text-[13px] text-muted mb-3" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-1.5">
+        <li><a href="/" class="hover:text-ink">首页</a></li>
+        <li><span>/</span></li>
+        <li class="text-ink font-medium">42家机场品牌库</li>
+      </ol>
+    </nav>
+
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-line">
+      <div>
+        <h1 class="font-display text-[clamp(28px,4vw,44px)] font-extrabold tracking-tight text-ink">
+          42 家翻墙机场品牌库
+        </h1>
+        <p class="mt-2 text-[15px] text-muted max-w-[55ch]">
+          严格按实测数据与口碑排布，首选主推光速云与前十强。支持按专线架构、协议、实测图与价格区间实时瞬时筛选。
+        </p>
+      </div>
+
+      <div class="text-[13px] font-mono text-muted bg-tile/60 px-3 py-1.5 rounded-lg border border-line">
+        收录总计: <strong class="text-pine font-bold">42</strong> 家 · 动态排序
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & Sort Bar -->
+  <section class="mx-auto max-w-6xl px-5 pb-12 sm:pb-20" data-catalog>
+    <div class="mb-8 rounded-2xl border border-line bg-paper/90 p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <!-- Tag Filter Buttons -->
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto" data-tag-filter role="group" aria-label="按标签筛选">
+        {filterTags.map((tag, i) => (
+          <button
+            type="button"
+            data-tag={tag.value}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            class="rounded-lg border border-line px-3 py-1.5 text-[13px] font-medium transition hover:border-ink aria-pressed:border-pine aria-pressed:bg-pine aria-pressed:text-white"
+          >
+            {tag.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Sort Selection -->
+      <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+        <label class="flex items-center gap-2 text-[13px] text-muted whitespace-nowrap">
+          <span>排序方式:</span>
+          <select data-sort class="rounded-lg border border-line bg-paper px-3 py-1.5 text-[13px] text-ink font-medium outline-none focus:border-pine">
+            <option value="rank-asc">综合排名 (推荐首选)</option>
+            <option value="price-asc">入门价格: 由低到高</option>
+            <option value="price-desc">入门价格: 由高到低</option>
+            <option value="name-asc">品牌名称 A–Z</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- Airport Cards Grid -->
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-grid>
+      {AIRPORTS.map((airport) => (
+        <AirportCard airport={airport} featured={airport.rank === 1} />
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    <div data-empty class="hidden rounded-2xl border border-line bg-tile/40 py-16 text-center">
+      <p class="text-3xl">🔍</p>
+      <h3 class="mt-3 font-display text-lg font-bold text-ink">没有找到匹配的机场品牌</h3>
+      <p class="mt-1 text-[14px] text-muted">请尝试切换其他筛选标签，或重置排序条件。</p>
+    </div>
+  </section>
+
+  <!-- Filter & Sort Script -->
+  <script>
+    const root = document.querySelector('[data-catalog]');
+    if (root) {
+      const grid = root.querySelector('[data-grid]')!;
+      const cards = [...grid.querySelectorAll<HTMLElement>('[data-card]')];
+      const empty = root.querySelector<HTMLElement>('[data-empty]')!;
+      let activeTag = '';
+
+      function apply() {
+        let visibleCount = 0;
+        for (const card of cards) {
+          const tags = card.dataset.tags || '';
+          const rank = Number(card.dataset.rank);
+          let match = true;
+
+          if (activeTag === 'TOP10强推') {
+            match = rank <= 10;
+          } else if (activeTag === '极致平价') {
+            match = Number(card.dataset.price) <= 8;
+          } else if (activeTag) {
+            match = tags.includes(activeTag) || card.dataset.line?.includes(activeTag) || false;
+          }
+
+          card.classList.toggle('hidden', !match);
+          if (match) visibleCount++;
+        }
+        empty.classList.toggle('hidden', visibleCount > 0);
+      }
+
+      root.querySelector('[data-tag-filter]')?.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-tag]');
+        if (!btn) return;
+        activeTag = btn.dataset.tag!;
+        root.querySelectorAll('[data-tag]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        apply();
+      });
+
+      root.querySelector<HTMLSelectElement>('[data-sort]')?.addEventListener('change', (e) => {
+        const mode = (e.target as HTMLSelectElement).value;
+        const sorted = [...cards].sort((a, b) => {
+          if (mode === 'price-asc') return Number(a.dataset.price) - Number(b.dataset.price);
+          if (mode === 'price-desc') return Number(b.dataset.price) - Number(a.dataset.price);
+          if (mode === 'name-asc') return (a.dataset.title || '').localeCompare(b.dataset.title || '');
+          return Number(a.dataset.rank) - Number(b.dataset.rank);
+        });
+        sorted.forEach((card) => grid.appendChild(card));
+      });
+    }
+  </script>
+</Layout>

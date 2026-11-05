@@ -4,71 +4,69 @@ import { CONTACTS as T } from '../constants/pages';
 ---
 
 <Layout title={T.meta.title} description={T.meta.description}>
-  <section class="mx-auto max-w-6xl px-5 pb-4 sm:pb-8 pt-6 sm:pt-12">
+  <section class="mx-auto max-w-6xl px-5 pb-6 pt-6 sm:pb-10 sm:pt-14">
     <h1 class="font-display text-[clamp(32px,5vw,52px)] font-extrabold tracking-tight">{T.title}</h1>
     <p class="mt-3 max-w-[52ch] text-[16px] leading-relaxed text-muted">{T.text}</p>
   </section>
 
-  <section class="mx-auto grid max-w-6xl gap-6 px-5 pb-8 sm:pb-16 md:grid-cols-[1fr_1.3fr]">
+  <section class="mx-auto grid max-w-6xl gap-8 px-5 pb-12 sm:pb-20 md:grid-cols-[1fr_1.3fr]">
     <div class="space-y-4">
       <div class="rounded-2xl border border-line bg-tile/60 p-6">
-        <h2 class="text-[15px] font-semibold">{T.cards.email.title}</h2>
-        <a href={`mailto:${T.cards.email.address}`} class="mt-1 block text-[15px] text-pine underline underline-offset-2">{T.cards.email.address}</a>
+        <h2 class="text-[15px] font-semibold text-ink">{T.cards.email.title}</h2>
+        <a href={`mailto:${T.cards.email.address}`} class="mt-1 block text-[15px] text-pine underline underline-offset-2 hover:opacity-85">{T.cards.email.address}</a>
         <p class="mt-2 text-[13px] text-muted">{T.cards.email.note}</p>
       </div>
       <div class="rounded-2xl border border-line bg-tile/60 p-6">
-        <h2 class="text-[15px] font-semibold">{T.cards.warehouse.title}</h2>
+        <h2 class="text-[15px] font-semibold text-ink">{T.cards.warehouse.title}</h2>
         <p class="mt-1 text-[15px] text-muted">{T.cards.warehouse.lines[0]}<br />{T.cards.warehouse.lines[1]}</p>
       </div>
       <div class="rounded-2xl border border-line bg-tile/60 p-6">
-        <h2 class="text-[15px] font-semibold">{T.cards.elsewhere.title}</h2>
-        <ul class="mt-2 space-y-1.5 text-[15px] text-muted">
-          {T.cards.elsewhere.links.map((l) => (
-            <li><a href={l.href} class="hover:text-ink">{l.label}</a></li>
-          ))}
-        </ul>
+        <h2 class="text-[15px] font-semibold text-ink">{T.cards.hours.title}</h2>
+        <p class="mt-1 text-[15px] text-muted">{T.cards.hours.lines[0]}<br />{T.cards.hours.lines[1]}</p>
       </div>
     </div>
 
     <form
       class="rounded-2xl border border-line bg-tile/40 p-6 sm:p-8"
-      x-ignore
       data-contact-form
-      data-demo-note={T.form.demoNote}
+      data-success-note={T.form.successNote}
       novalidate
     >
       <div class="grid gap-4 sm:grid-cols-2">
         <label class="block">
-          <span class="text-[13px] font-medium">{T.form.nameLabel}</span>
+          <span class="text-[13px] font-medium text-ink">{T.form.nameLabel}</span>
           <input type="text" name="name" required placeholder={T.form.namePlaceholder}
-            class="mt-1.5 w-full rounded-md border border-line bg-paper px-3.5 py-3 text-[15px] outline-none placeholder:text-muted focus:border-pine" />
+            class="mt-1.5 w-full rounded-md border border-line bg-paper px-3.5 py-3 text-[15px] outline-none placeholder:text-muted focus:border-pine transition" />
         </label>
         <label class="block">
-          <span class="text-[13px] font-medium">{T.form.emailLabel}</span>
+          <span class="text-[13px] font-medium text-ink">{T.form.emailLabel}</span>
           <input type="email" name="email" required placeholder={T.form.emailPlaceholder}
-            class="mt-1.5 w-full rounded-md border border-line bg-paper px-3.5 py-3 text-[15px] outline-none placeholder:text-muted focus:border-pine" />
+            class="mt-1.5 w-full rounded-md border border-line bg-paper px-3.5 py-3 text-[15px] outline-none placeholder:text-muted focus:border-pine transition" />
         </label>
       </div>
       <label class="mt-4 block">
-        <span class="text-[13px] font-medium">{T.form.messageLabel}</span>
+        <span class="text-[13px] font-medium text-ink">{T.form.messageLabel}</span>
         <textarea name="message" rows="6" required placeholder={T.form.messagePlaceholder}
-          class="mt-1.5 w-full resize-y rounded-md border border-line bg-paper px-3.5 py-3 text-[15px] outline-none placeholder:text-muted focus:border-pine"></textarea>
+          class="mt-1.5 w-full resize-y rounded-md border border-line bg-paper px-3.5 py-3 text-[15px] outline-none placeholder:text-muted focus:border-pine transition"></textarea>
       </label>
-      <button type="submit" class="mt-5 w-full rounded-md bg-pine py-3.5 text-[15px] font-semibold text-white hover:bg-pine-deep sm:w-auto sm:px-8">
+      <button type="submit" class="mt-5 w-full rounded-md bg-pine py-3.5 text-[15px] font-semibold text-white hover:bg-pine-deep sm:w-auto sm:px-8 transition">
         {T.form.submitLabel}
       </button>
-      <p data-contact-note class="mt-4 hidden rounded-md bg-pine-soft px-4 py-3 text-[13px] leading-relaxed"></p>
+      <p data-contact-note class="mt-4 hidden rounded-md bg-pine/10 p-4 text-[14px] font-medium text-pine"></p>
     </form>
   </section>
 
   <script>
-    const form = document.querySelector<HTMLFormElement>('[data-contact-form]')!;
-    const note = document.querySelector<HTMLElement>('[data-contact-note]')!;
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!form.reportValidity()) return;
-      note.textContent = form.dataset.demoNote!;
-      note.classList.remove('hidden');
-    });
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    const note = document.querySelector<HTMLElement>('[data-contact-note]');
+    if (form && note) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+        note.textContent = form.dataset.successNote!;
+        note.classList.remove('hidden');
+        form.reset();
+      });
+    }
   </script>
 </Layout>

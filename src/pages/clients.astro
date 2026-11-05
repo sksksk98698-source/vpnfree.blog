@@ -1,0 +1,223 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { CLIENT_APPS } from '../data/clients';
+import { SITE } from '../constants/components';
+
+const pageTitle = `全平台代理客户端下载与配置指南 — ${SITE.name} (${SITE.enName})`;
+const pageDescription = `汇总 Windows、macOS、iOS (小火箭)、Android 及软路由官方正版代理客户端。涵盖 Clash Verge Rev、v2rayN、Surge、Stash、v2rayNG、Hiddify、OpenClash，提供安全直连下载与新手图文配置教程。`;
+
+// Group by OS
+const platforms = [
+  { id: 'all', label: '全部客户端', count: CLIENT_APPS.length },
+  { id: 'windows', label: 'Windows', count: CLIENT_APPS.filter((c) => c.os === 'windows').length },
+  { id: 'macos', label: 'macOS', count: CLIENT_APPS.filter((c) => c.os === 'macos').length },
+  { id: 'ios', label: 'iOS (iPhone/iPad)', count: CLIENT_APPS.filter((c) => c.os === 'ios').length },
+  { id: 'android', label: 'Android', count: CLIENT_APPS.filter((c) => c.os === 'android').length },
+  { id: 'router', label: '软路由 / OpenWrt', count: CLIENT_APPS.filter((c) => c.os === 'router').length },
+];
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: '客户端大全', item: `${SITE.url}/clients` },
+  ],
+};
+---
+
+<Layout title={pageTitle} description={pageDescription} jsonLd={breadcrumbSchema}>
+  <!-- Top Breadcrumb -->
+  <div class="border-b border-line bg-tile/30">
+    <div class="mx-auto max-w-6xl px-5 py-3 text-[13px] text-muted">
+      <a href="/" class="hover:text-ink">首页</a>
+      <span class="mx-2">/</span>
+      <span class="text-ink font-medium">客户端大全与配置指南</span>
+    </div>
+  </div>
+
+  <!-- Hero Header -->
+  <section class="border-b border-line bg-paper py-10 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="inline-flex items-center gap-2 rounded-full border border-pine/30 bg-pine/10 px-3 py-1 text-[12px] font-semibold text-pine">
+        官方正版渠道 · 杜绝第三方修改版后门
+      </div>
+      <h1 class="mt-4 font-display text-[clamp(32px,5vw,50px)] font-extrabold tracking-tight text-ink leading-tight">
+        全平台翻墙代理客户端大全
+      </h1>
+      <p class="mt-3 max-w-3xl text-[16px] text-muted leading-relaxed">
+        翻墙机场需要搭配第三方客户端使用。本指南为您精选主流操作系统（Windows / Mac / iPhone / Android / 软路由）上活跃维护、体验优秀、原生支持 Mihomo / Xray / sing-box 内核的开源与商业级客户端，全部提供官方正版直达下载。
+      </p>
+
+      <!-- 4-Step Quick Setup Guide -->
+      <div class="mt-10 rounded-2xl border border-line bg-tile/40 p-6 sm:p-8">
+        <h2 class="font-display text-[20px] font-bold text-ink">通用极简 4 步上手教程（以光速云为例）</h2>
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-xl border border-line bg-paper p-4">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-pine text-[13px] font-bold text-white font-mono">1</span>
+            <h3 class="mt-3 text-[15px] font-bold text-ink">一键复制订阅</h3>
+            <p class="mt-1 text-[13px] text-muted">在机场后台（如光速云）仪表盘点击“一键导入订阅”或复制订阅 URL。</p>
+          </div>
+          <div class="rounded-xl border border-line bg-paper p-4">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-pine text-[13px] font-bold text-white font-mono">2</span>
+            <h3 class="mt-3 text-[15px] font-bold text-ink">导入客户端配置</h3>
+            <p class="mt-1 text-[13px] text-muted">打开 Clash Verge 或 v2rayN，粘贴订阅链接并点击保存/下载配置。</p>
+          </div>
+          <div class="rounded-xl border border-line bg-paper p-4">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-pine text-[13px] font-bold text-white font-mono">3</span>
+            <h3 class="mt-3 text-[15px] font-bold text-ink">开启规则分流</h3>
+            <p class="mt-1 text-[13px] text-muted">代理模式务必选择“Rule / 规则模式”，国内网站直连不耗流量，海外走专线。</p>
+          </div>
+          <div class="rounded-xl border border-line bg-paper p-4">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-pine text-[13px] font-bold text-white font-mono">4</span>
+            <h3 class="mt-3 text-[15px] font-bold text-ink">启动系统代理</h3>
+            <p class="mt-1 text-[13px] text-muted">勾选“系统代理 (System Proxy)”或打开“TUN 虚拟网卡”，即可畅享超快网络！</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Pills -->
+  <section class="mx-auto max-w-6xl px-5 pt-8">
+    <div class="flex flex-wrap items-center gap-2 border-b border-line pb-4" id="os-filter-buttons">
+      {platforms.map((p, idx) => (
+        <button
+          type="button"
+          data-os={p.id}
+          class:list={[
+            'os-btn rounded-lg px-3.5 py-1.5 text-[13px] font-semibold transition',
+            idx === 0 ? 'bg-pine text-white' : 'border border-line bg-paper text-muted hover:border-pine hover:text-ink'
+          ]}
+        >
+          {p.label} ({p.count})
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <!-- Client Cards Grid -->
+  <section class="mx-auto max-w-6xl px-5 py-8">
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" id="clients-grid">
+      {CLIENT_APPS.map((app) => (
+        <article
+          class="client-card flex flex-col justify-between rounded-2xl border border-line bg-paper p-6 transition-all hover:border-pine/60 hover:shadow-lg"
+          data-os={app.os}
+        >
+          <div>
+            <!-- Header -->
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-display text-[20px] font-bold text-ink">{app.name}</h3>
+                  {app.recommended && (
+                    <span class="rounded bg-pine/10 px-2 py-0.5 text-[11px] font-bold text-pine">
+                      {app.badge}
+                    </span>
+                  )}
+                </div>
+                <p class="mt-1 text-[12px] font-medium text-muted">
+                  适用平台：<strong class="text-ink">{app.osDisplay}</strong> · 核心：<span class="font-mono">{app.core}</span>
+                </p>
+              </div>
+
+              <span class:list={[
+                'rounded-full px-2.5 py-1 text-[11px] font-semibold',
+                app.pricing.includes('免费') ? 'bg-tile text-muted' : 'bg-pine/10 text-pine'
+              ]}>
+                {app.pricing}
+              </span>
+            </div>
+
+            <!-- Description -->
+            <p class="mt-4 text-[14px] leading-relaxed text-muted">{app.description}</p>
+
+            <!-- Features -->
+            <div class="mt-5 space-y-2 border-t border-line/60 pt-4">
+              <p class="text-[12px] font-semibold text-ink">核心亮点与特性：</p>
+              <ul class="space-y-1 text-[13px] text-muted">
+                {app.features.map((f) => (
+                  <li class="flex items-center gap-2">
+                    <span class="text-pine font-bold">✓</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <!-- CTA Download -->
+          <div class="mt-6 border-t border-line/60 pt-4">
+            <a
+              href={app.downloadUrl}
+              target="_blank"
+              rel="nofollow noopener"
+              class="flex w-full items-center justify-center gap-2 rounded-lg bg-pine px-4 py-2.5 text-center text-[13px] font-semibold text-white shadow-sm hover:bg-pine-deep transition"
+            >
+              <span>官方正版下载 / 发布页</span>
+              <span>↗</span>
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Troubleshooting FAQ -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-5">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-[26px] font-extrabold text-ink">客户端常见避坑疑问</h2>
+        <p class="mt-2 text-[14px] text-muted">为您解答从下载到日常使用中最常遇到的连接疑难</p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-xl border border-line bg-paper p-5">
+          <h3 class="text-[16px] font-bold text-ink">Q1：iPhone / iPad 怎么下载小火箭 (Shadowrocket)？</h3>
+          <p class="mt-2 text-[14px] text-muted leading-relaxed">
+            由于中国大陆 App Store 政策限制，小火箭未在国区上架。您需要准备一个海外 Apple ID（推荐美区或港区）。在 App Store 登录海外账号后搜索“Shadowrocket”（售价 $2.99 美元）。切记不要在“设置-iCloud”登录未知账号，仅在 App Store 内登录即可，确保手机数据安全。
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-line bg-paper p-5">
+          <h3 class="text-[16px] font-bold text-ink">Q2：开启代理后，国内网站（如百度、淘宝）打不开了或变慢？</h3>
+          <p class="mt-2 text-[14px] text-muted leading-relaxed">
+            请确认客户端代理模式为<strong>“规则模式 (Rule)”</strong>，而不是“全局模式 (Global)”。全局模式会强制所有流量都走境外机场节点，不仅白白浪费机场流量，还会导致国内网站访问缓慢甚至被国内服务安全风控拦截。
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-line bg-paper p-5">
+          <h3 class="text-[16px] font-bold text-ink">Q3：什么是 TUN 虚拟网卡模式？什么时候需要打开？</h3>
+          <p class="mt-2 text-[14px] text-muted leading-relaxed">
+            常规系统代理仅接管遵循系统代理协议的浏览器等软件。许多终端程序（PowerShell/Bash、Git、Docker、Telegram、Steam 游戏）默认不走系统代理。开启 Clash Verge 或 Stash 的<strong>TUN 模式</strong>后，客户端会在系统底层创建一张虚拟网卡，强制接管整机全部 TCP/UDP 流量，实现真正的全局无感知穿透。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const osBtns = document.querySelectorAll<HTMLButtonElement>('.os-btn');
+    const clientCards = document.querySelectorAll<HTMLElement>('.client-card');
+
+    osBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        osBtns.forEach((b) => {
+          b.classList.remove('bg-pine', 'text-white');
+          b.classList.add('border', 'border-line', 'bg-paper', 'text-muted');
+        });
+        btn.classList.add('bg-pine', 'text-white');
+        btn.classList.remove('border', 'border-line', 'bg-paper', 'text-muted');
+
+        const os = btn.getAttribute('data-os');
+        clientCards.forEach((card) => {
+          if (os === 'all') {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.toggle('hidden', card.dataset.os !== os);
+          }
+        });
+      });
+    });
+  </script>
+</Layout>

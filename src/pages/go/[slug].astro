@@ -1,0 +1,123 @@
+---
+import { AIRPORTS, type Airport } from '../../data/airports';
+import { SITE } from '../../constants/components';
+
+export async function getStaticPaths() {
+  return AIRPORTS.map((airport) => ({
+    params: { slug: airport.slug },
+    props: { airport },
+  }));
+}
+
+interface Props {
+  airport: Airport;
+}
+
+const { airport: a } = Astro.props;
+
+// 确定最终目标跳转 URL：如果 affLink 是指向 /go/ 自身，则回退到该品牌的测评详情页，避免循环重定向
+const isSelfLoop = !a.affLink || a.affLink.includes('/go/');
+const targetUrl = isSelfLoop ? `${SITE.url}/airports/${a.slug}` : a.affLink;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>正在安全跳转至 {a.name} 官方通道 — {SITE.name}</title>
+    <!-- 严格禁止搜索引擎索引与追踪商业中转链接 -->
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta http-equiv="refresh" content={`1;url=${targetUrl}`} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        background: #fbfbfa;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .card {
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 16px;
+        max-width: 480px;
+        width: 100%;
+        padding: 32px 24px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      }
+      .spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid #e5e5e5;
+        border-top-color: #0f766e;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 20px;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      h1 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 10px;
+        color: #111827;
+      }
+      p {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin: 0 0 24px;
+      }
+      .btn {
+        display: inline-block;
+        background: #0f766e;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 10px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+      .btn:hover {
+        background: #115e59;
+      }
+      .subtext {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="spinner"></div>
+      <h1>正在安全跳转至 {a.name}</h1>
+      <p>
+        您即将离开 {SITE.name}。如浏览器未在 2 秒内自动跳转，请点击下方绿色按钮直达。
+      </p>
+      <a href={targetUrl} class="btn" rel="nofollow sponsored noopener">
+        立即进入官方通道 &rarr;
+      </a>
+      <div class="subtext">
+        安全提示：请认准官方 SSL 证书认证通道，切勿在非官方页面输入敏感密码。
+      </div>
+    </div>
+
+    <script define:vars={{ targetUrl }}>
+      // 客户端双重保障快速跳出
+      setTimeout(() => {
+        window.location.replace(targetUrl);
+      }, 500);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,312 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { RADAR_BRANDS, WARNING_SIGNS } from '../data/radar-airports';
+import { SITE } from '../constants/components';
+
+const pageTitle = `2026 翻墙机场跑路预警与避坑雷达 (Risk Radar) — ${SITE.name} (${SITE.enName})`;
+const pageDescription = `全网首创独立网络避坑雷达：基于多节点分布式探针心跳监测。提供三色可信度评级、7大典型跑路征兆深度解剖、失联黑名单通报及高可靠备用专线无缝平替。`;
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: '避坑雷达', item: `${SITE.url}/radar` },
+  ],
+};
+
+const radarFaqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '机场突然所有节点连不上，是跑路了还是被攻击（DDoS）？',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '判断是临时故障还是恶意跑路的核心看三点：① 官方 Telegram 群是否还在正常交流（如果突然全员禁言则极度高危）；② 官网管理后台是否还能正常登录；③ 故障持续时间（正规机房遇到 DDoS 攻击通常在 2~6 小时内清洗恢复，若超过 3 天没有任何技术公告或工单回复，则大概率已处于跑路失联状态）。',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '万一购买的机场跑路了，有什么追回资金的途径？',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '如果使用的是信用卡（Visa/Mastercard）或 PayPal 支付，可在交易后 180 天内向发卡行或 PayPal 发起“未提供商品/服务”争议拒付申请（Chargeback）；如果是通过支付宝/微信扫第三方个人码转账，追回概率极低，因此我们强烈呼吁所有读者“坚持月付，杜绝大额充值”。',
+      },
+    },
+  ],
+};
+---
+
+<Layout title={pageTitle} description={pageDescription} jsonLd={[breadcrumbSchema, radarFaqSchema]}>
+  <!-- Top Breadcrumb -->
+  <div class="border-b border-line bg-tile/30">
+    <div class="mx-auto max-w-6xl px-5 py-3 text-[13px] text-muted">
+      <a href="/" class="hover:text-ink">首页</a>
+      <span class="mx-2">/</span>
+      <span class="text-ink font-medium">避坑雷达 · 机场跑路预警与可信评级</span>
+    </div>
+  </div>
+
+  <!-- Hero Header -->
+  <section class="border-b border-line bg-paper py-10 sm:py-16">
+    <div class="mx-auto max-w-6xl px-5">
+      <div class="inline-flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-[12px] font-semibold text-rose-600 dark:text-rose-400">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-500 opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-rose-500"></span>
+        </span>
+        全天候探针监测 · 独立监督看门狗
+      </div>
+
+      <h1 class="mt-4 font-display text-[clamp(32px,5vw,50px)] font-extrabold tracking-tight text-ink leading-tight">
+        2026 翻墙机场跑路预警与避坑雷达
+      </h1>
+      <p class="mt-3 max-w-3xl text-[16px] text-muted leading-relaxed">
+        翻墙机场跑路早已成为行业最大痛点。部分不良商家打着“99元终身永久”的旗号疯狂圈钱，数月后关站跑路。VPN免费 作为独立网络可观测平台，设立红黄绿可信度雷达，实时通报异动风险，为您的钱包筑起坚实防火墙。
+      </p>
+
+      <!-- Radar Live Stats Dashboard -->
+      <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5">
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">持续追踪品牌数</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-ink">42+ 家</p>
+          <p class="text-[11px] text-muted">涵盖主流专线与平价中继</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">72h 正常运营率</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-emerald-600 dark:text-emerald-400">98.2%</p>
+          <p class="text-[11px] text-muted">基于自动化网络探针心跳</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">高危异动关注</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-amber-500">2 家</p>
+          <p class="text-[11px] text-muted">晚高峰剧烈丢包/域名异常</p>
+        </div>
+        <div class="rounded-xl border border-line bg-tile/50 p-4">
+          <p class="text-[12px] font-medium text-muted">历史跑路失联通报</p>
+          <p class="mt-1 font-mono text-[22px] font-bold text-rose-500">已建档复盘</p>
+          <p class="text-[11px] text-muted">持续曝光黑产收割骗局</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter & Radar Grid -->
+  <section class="mx-auto max-w-6xl px-5 pt-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
+      <div class="flex flex-wrap items-center gap-2" id="radar-filter-btns">
+        <button
+          type="button"
+          data-status="all"
+          class="radar-btn active rounded-lg bg-pine px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-sm transition"
+        >
+          全部观测 ({RADAR_BRANDS.length})
+        </button>
+        <button
+          type="button"
+          data-status="green"
+          class="radar-btn rounded-lg border border-line bg-paper px-3.5 py-1.5 text-[13px] font-medium text-muted hover:border-pine hover:text-ink transition"
+        >
+          🟢 绿色健康池
+        </button>
+        <button
+          type="button"
+          data-status="yellow"
+          class="radar-btn rounded-lg border border-line bg-paper px-3.5 py-1.5 text-[13px] font-medium text-muted hover:border-pine hover:text-ink transition"
+        >
+          🟡 黄色高危预警
+        </button>
+        <button
+          type="button"
+          data-status="red"
+          class="radar-btn rounded-lg border border-line bg-paper px-3.5 py-1.5 text-[13px] font-medium text-muted hover:border-pine hover:text-ink transition"
+        >
+          🔴 红色跑路通报
+        </button>
+      </div>
+
+      <div class="text-[13px] text-muted">
+        评级每日依据网络探针打卡结果实时更新
+      </div>
+    </div>
+  </section>
+
+  <!-- Radar Brands Display -->
+  <section class="mx-auto max-w-6xl px-5 py-8">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2" id="radar-cards-grid">
+      {RADAR_BRANDS.map((item) => (
+        <article
+          class="radar-card flex flex-col justify-between rounded-2xl border border-line bg-paper p-6 transition-all hover:border-pine/60 hover:shadow-lg"
+          data-status={item.status}
+        >
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="font-display text-[20px] font-bold text-ink">{item.name}</h3>
+                <p class="mt-1 text-[12px] text-muted">运营资历：{item.operatingDuration}</p>
+              </div>
+
+              <span class:list={[
+                'rounded-full px-3 py-1 text-[12px] font-bold',
+                item.status === 'green' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+                item.status === 'yellow' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                item.status === 'red' && 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
+              ]}>
+                {item.statusText}
+              </span>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-tile/40 p-3 text-[13px] border border-line/50">
+              <div>
+                <span class="text-muted block text-[11px]">节点在线率</span>
+                <strong class="font-mono text-ink">{item.uptime}</strong>
+              </div>
+              <div>
+                <span class="text-muted block text-[11px]">风险因子评估</span>
+                <strong class:list={[
+                  'font-medium',
+                  item.status === 'green' && 'text-emerald-600',
+                  item.status === 'yellow' && 'text-amber-600',
+                  item.status === 'red' && 'text-rose-600'
+                ]}>{item.riskFactor}</strong>
+              </div>
+            </div>
+
+            <p class="mt-4 text-[13px] leading-relaxed text-muted bg-tile/30 rounded-lg p-3">
+              <strong class="text-ink">最新监测备忘：</strong>{item.lastIncidentNote}
+            </p>
+          </div>
+
+          {/* Replacement recommendation if yellow/red */}
+          {item.recommendedAlternative && (
+            <div class="mt-5 border-t border-line/60 pt-4">
+              <div class="rounded-xl border border-pine/30 bg-pine/5 p-3.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[12px] font-bold text-pine">💡 安全稳定平替推荐：</span>
+                  <span class="font-bold text-ink text-[13px]">{item.recommendedAlternative.name}</span>
+                </div>
+                <p class="mt-1 text-[12px] text-muted">{item.recommendedAlternative.reason}</p>
+                <div class="mt-3 flex items-center justify-end gap-2">
+                  <a
+                    href={`/airports/${item.recommendedAlternative.slug}`}
+                    class="rounded-md border border-line bg-paper px-3 py-1.5 text-[12px] font-semibold text-ink hover:bg-tile transition"
+                  >
+                    查看测评报告
+                  </a>
+                  <a
+                    href={item.recommendedAlternative.affLink}
+                    target="_blank"
+                    rel="nofollow sponsored noopener"
+                    class="rounded-md bg-pine px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm hover:bg-pine-deep transition"
+                  >
+                    {item.recommendedAlternative.coupon ? `券【${item.recommendedAlternative.coupon}】直达官网` : '直达官网'}
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- 7 Warning Signs Deep Dive -->
+  <section class="border-t border-line bg-tile/30 py-12 sm:py-16">
+    <div class="mx-auto max-w-4xl px-5">
+      <div class="text-center mb-10">
+        <span class="rounded bg-rose-500/10 px-2.5 py-1 text-[12px] font-bold text-rose-600 font-mono">MUST READ</span>
+        <h2 class="mt-2 font-display text-[28px] font-extrabold text-ink">
+          机场跑路 7 大典型前兆万字深度解剖
+        </h2>
+        <p class="mt-2 text-[15px] text-muted">
+          一旦商家出现以下 2 条以上的异动，请立即停止续费年付，转移核心业务！
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        {WARNING_SIGNS.map((sign, idx) => (
+          <div class="rounded-2xl border border-line bg-paper p-6 transition hover:border-pine/50">
+            <h3 class="font-display text-[17px] font-bold text-ink flex items-center gap-2.5">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-[12px] font-mono font-bold text-rose-600">
+                {idx + 1}
+              </span>
+              <span>{sign.title}</span>
+            </h3>
+            <p class="mt-3 text-[14px] leading-relaxed text-muted pl-8.5">{sign.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Emergency Interception Banner -->
+  <section class="mx-auto max-w-6xl px-5 py-12">
+    <div class="rounded-2xl border border-line bg-tile p-6 sm:p-10 text-center">
+      <h2 class="font-display text-[24px] sm:text-[28px] font-extrabold text-ink">
+        您当前的机场跑路或经常失联？
+      </h2>
+      <p class="mt-3 text-[15px] text-muted max-w-2xl mx-auto leading-relaxed">
+        不要将鸡蛋放在同一个篮子里。我们强烈建议采用<strong>“1家主力物理专线 + 1家平价按量备用”</strong>的双冗余策略。立即转用全网实测 TOP 1 物理专线【光速云】，晚高峰 0.0% 丢包，支持月付无资金风险。
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <a
+          href="/airports/guangshiyun"
+          class="rounded-lg bg-pine px-6 py-3 text-[14px] font-semibold text-white shadow-sm hover:bg-pine-deep transition"
+        >
+          查看光速云深度实测报告
+        </a>
+        <a
+          href="/airports"
+          class="rounded-lg border border-line bg-paper px-6 py-3 text-[14px] font-semibold text-ink hover:bg-tile transition"
+        >
+          浏览完整 42 家机场品牌库
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Radar FAQ -->
+  <section class="border-t border-line bg-paper py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl px-5">
+      <div class="text-center mb-8">
+        <h2 class="font-display text-[26px] font-extrabold text-ink">避坑与维权常见疑问解答</h2>
+      </div>
+
+      <div class="space-y-4">
+        {radarFaqSchema.mainEntity.map((item) => (
+          <div class="rounded-xl border border-line bg-tile/40 p-5">
+            <h3 class="text-[16px] font-bold text-ink">Q：{item.name}</h3>
+            <p class="mt-2 text-[14px] text-muted leading-relaxed">A：{item.acceptedAnswer.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const radarBtns = document.querySelectorAll<HTMLButtonElement>('.radar-btn');
+    const radarCards = document.querySelectorAll<HTMLElement>('.radar-card');
+
+    radarBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        radarBtns.forEach((b) => {
+          b.classList.remove('bg-pine', 'text-white');
+          b.classList.add('border', 'border-line', 'bg-paper', 'text-muted');
+        });
+        btn.classList.add('bg-pine', 'text-white');
+        btn.classList.remove('border', 'border-line', 'bg-paper', 'text-muted');
+
+        const status = btn.getAttribute('data-status');
+        radarCards.forEach((card) => {
+          if (status === 'all') {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.toggle('hidden', card.dataset.status !== status);
+          }
+        });
+      });
+    });
+  </script>
+</Layout>

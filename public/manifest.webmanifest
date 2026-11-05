@@ -1,0 +1,16 @@
+{
+  "name": "VPN免费 (vpnfree.blog)",
+  "short_name": "VPN免费",
+  "description": "2026 翻墙机场独立评测实验室 · 42家品牌晚高峰测速与解锁实测",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#1e4d3b",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
